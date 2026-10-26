@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --primary: #0f2942;
+    --primary-dark: #001428;
+    --secondary: #0d9488;
+    --secondary-container: #86f2e4;
+    --crimson: #dc2626;
+    --crimson-bg: #fef2f2;
+    --crimson-border: #f87171;
+    --amber: #d97706;
+    --amber-bg: #fffbeb;
+    --amber-border: #fcd34d;
+    --surface: #f8fafc;
+    --surface-card: #ffffff;
+    --surface-subtle: #f1f5f9;
+    --border-neutral: #e2e8f0;
+    --text-primary: #191c1e;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+  }
+
+  body {
+    background-color: #f8fafc;
+    color: #191c1e;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    font-feature-settings: "tnum" on, "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Tabular figures for clinical metrics and DZD pricing */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom crisp scrollbar for clinical panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

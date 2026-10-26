@@ -1,0 +1,6 @@
+{
+  "name": "PharmaDZ Clinical - Pharmacopée & Sécurité Thérapeutique",
+  "description": "Système clinique d'aide à la décision thérapeutique, validation posologique, analyse des interactions et formulaire CNAS pour praticiens hospitaliers et libéraux.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
