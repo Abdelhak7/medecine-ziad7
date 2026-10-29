@@ -12,6 +12,13 @@ import {
 import { 
   analyzePrescription 
 } from '../lib/prescription-checker';
+import {
+  getDrugClasses,
+  getDrugSpecialties,
+  getPharmacologicalClassNames,
+  getSpecialtyNames,
+  matchesDrugQuery,
+} from '../lib/medical-classification';
 import { ClinicalHeader } from '../components/ClinicalHeader';
 import { UniversalOmnisearch } from '../components/UniversalOmnisearch';
 import { SpecialtySidebar } from '../components/SpecialtySidebar';
@@ -36,6 +43,8 @@ export default function ClinicalApp() {
 
   // Sidebar filters
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('Toutes');
+  const [selectedClass, setSelectedClass] = useState<string>('Toutes');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const customData = useSyncExternalStore(
     subscribeCustomPharmacopoeia,
@@ -69,10 +78,14 @@ export default function ClinicalApp() {
   // Mobile drawer for prescription tray
   const [isMobileTrayOpen, setIsMobileTrayOpen] = useState(false);
 
-  // Unique list of specialties
+  // Unique list of specialties: canonical taxonomy plus user-created entries.
   const specialties = useMemo(() => {
-    const merged = Array.from(new Set(ALGERIAN_DRUG_DATABASE.map((d) => d.specialty)));
-    for (const specialty of [...customSpecialties, ...customDrugs.map((d) => d.specialty)]) {
+    const merged = getSpecialtyNames();
+    const additions = [
+      ...customSpecialties,
+      ...customDrugs.flatMap((drug) => getDrugSpecialties(drug)),
+    ];
+    for (const specialty of additions) {
       if (specialty && !merged.includes(specialty)) {
         merged.push(specialty);
       }
@@ -80,13 +93,30 @@ export default function ClinicalApp() {
     return ['Toutes', ...merged];
   }, [customSpecialties, customDrugs]);
 
-  // Filtered drugs based on sidebar selection
+  // Canonical pharmacological classes plus user-created classifications.
+  const pharmacologicalClasses = useMemo(() => {
+    const merged = getPharmacologicalClassNames();
+    for (const drug of customDrugs) {
+      for (const pharmacologicalClass of getDrugClasses(drug)) {
+        if (pharmacologicalClass && !merged.includes(pharmacologicalClass)) {
+          merged.push(pharmacologicalClass);
+        }
+      }
+    }
+    return ['Toutes', ...merged];
+  }, [customDrugs]);
+
+  // Filtered drugs based on specialty, class, and indexed search.
   const filteredDrugs = useMemo(() => {
     return drugs.filter((drug) => {
-      const matchSpecialty = selectedSpecialty === 'Toutes' || drug.specialty === selectedSpecialty;
-      return matchSpecialty;
+      const matchSpecialty =
+        selectedSpecialty === 'Toutes' ||
+        getDrugSpecialties(drug).includes(selectedSpecialty);
+      const matchClass =
+        selectedClass === 'Toutes' || getDrugClasses(drug).includes(selectedClass);
+      return matchSpecialty && matchClass && matchesDrugQuery(drug, searchQuery);
     });
-  }, [drugs, selectedSpecialty]);
+  }, [drugs, searchQuery, selectedClass, selectedSpecialty]);
 
   // Evaluate renal state
   const renalState = useMemo(() => {
@@ -144,6 +174,8 @@ export default function ClinicalApp() {
     saveCustomPharmacopoeia({ drugs: nextDrugs, specialties: nextSpecialties });
     setSelectedDrug(drug);
     setSelectedSpecialty(drug.specialty);
+    setSelectedClass('Toutes');
+    setSearchQuery('');
     setCurrentTab('monographs');
   };
 
@@ -161,7 +193,25 @@ export default function ClinicalApp() {
   const handleSelectSpecialty = (specialty: string) => {
     setSelectedSpecialty(specialty);
     const firstDrug = drugs.find(
-      (drug) => specialty === 'Toutes' || drug.specialty === specialty
+      (drug) =>
+        (specialty === 'Toutes' || getDrugSpecialties(drug).includes(specialty)) &&
+        (selectedClass === 'Toutes' || getDrugClasses(drug).includes(selectedClass)) &&
+        matchesDrugQuery(drug, searchQuery)
+    );
+    if (firstDrug) {
+      setSelectedDrug(firstDrug);
+    }
+  };
+
+  const handleSelectClass = (pharmacologicalClass: string) => {
+    setSelectedClass(pharmacologicalClass);
+    const firstDrug = drugs.find(
+      (drug) =>
+        (selectedSpecialty === 'Toutes' ||
+          getDrugSpecialties(drug).includes(selectedSpecialty)) &&
+        (pharmacologicalClass === 'Toutes' ||
+          getDrugClasses(drug).includes(pharmacologicalClass)) &&
+        matchesDrugQuery(drug, searchQuery)
     );
     if (firstDrug) {
       setSelectedDrug(firstDrug);
@@ -196,17 +246,21 @@ export default function ClinicalApp() {
                 onSelectDrug={(drug) => setSelectedDrug(drug)}
                 onPrescribeQuick={(drug) => handleTogglePrescription(drug)}
                 isPrescribed={isDrugPrescribed}
+                onQueryChange={setSearchQuery}
               />
             </div>
 
             {/* 3-Column Layout: Left Specialty Sidebar (w-64) | Center Monograph (flex-1) | Right Persistent Tray (w-80) */}
             <div className="flex flex-col lg:flex-row gap-6 items-start">
-              {/* Column 1: Persistent Category / Specialty Navigation (Desktop & Tablet) */}
-              <div className="hidden lg:block">
+              {/* Column 1: Persistent Specialty & Pharmacological Class Navigation */}
+              <div className="w-full lg:w-auto">
                 <SpecialtySidebar
                   specialties={specialties}
+                  classes={pharmacologicalClasses}
                   selectedSpecialty={selectedSpecialty}
+                  selectedClass={selectedClass}
                   onSelectSpecialty={handleSelectSpecialty}
+                  onSelectClass={handleSelectClass}
                   drugs={drugs}
                 />
               </div>
@@ -216,10 +270,10 @@ export default function ClinicalApp() {
                 {filteredDrugs.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
                     <p className="text-sm font-semibold text-[#0F2942]">
-                      Aucun médicament dans cette spécialité.
+                      Aucun médicament ne correspond aux filtres sélectionnés.
                     </p>
                     <p className="mt-1 text-xs text-slate-500">
-                      Ajoutez une monographie pour commencer.
+                      Modifiez la spécialité, la classe ou la recherche, ou ajoutez une monographie.
                     </p>
                     <button
                       onClick={() => setIsAddModalOpen(true)}
@@ -230,31 +284,84 @@ export default function ClinicalApp() {
                   </div>
                 ) : (
                   <>
-                    {/* Horizontal Quick-Selector Pill Strip for currently filtered specialty */}
-                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-                      <span className="text-slate-400 font-semibold uppercase text-[10px] tracking-wider shrink-0 mr-1">
-                        Index :
-                      </span>
-                      {filteredDrugs.map((drug) => {
-                        const isSelected = selectedDrug.id === drug.id;
-                        const inPrescription = isDrugPrescribed(drug.id);
-                        return (
+                    {/* Indexed medication rows with DCI, presentation and classification */}
+                    <div className="overflow-hidden rounded-xl border border-[#E2E8F0] bg-white shadow-xs">
+                      <div className="flex flex-col gap-1.5 border-b border-slate-100 bg-slate-50/70 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                          <span>Index des médicaments</span>
+                          <span className="font-mono text-slate-400">
+                            {filteredDrugs.length} résultat{filteredDrugs.length > 1 ? 's' : ''}
+                          </span>
+                        </div>
+                        {selectedClass !== 'Toutes' && (
                           <button
-                            key={drug.id}
-                            onClick={() => setSelectedDrug(drug)}
-                            className={`px-3 py-1.5 rounded text-xs font-semibold whitespace-nowrap shrink-0 transition-colors border ${
-                              isSelected
-                                ? 'bg-[#0F2942] text-white border-[#0F2942]'
-                                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
-                            }`}
+                            onClick={() => setSelectedClass('Toutes')}
+                            className="self-start rounded-full border border-teal-200 bg-teal-50 px-2.5 py-0.5 text-[10px] font-semibold text-teal-800 transition-colors hover:bg-teal-100 sm:self-auto"
+                            title="Retirer le filtre de classe"
                           >
-                            <span>{drug.brandName}</span>
-                            {inPrescription && (
-                              <span className="ml-1 text-[10px] text-teal-400 font-bold">●</span>
-                            )}
+                            Classe : {selectedClass} ×
                           </button>
-                        );
-                      })}
+                        )}
+                      </div>
+
+                      <div className="max-h-72 divide-y divide-slate-100 overflow-y-auto">
+                        {filteredDrugs.map((drug) => {
+                          const isSelected = selectedDrug.id === drug.id;
+                          const inPrescription = isDrugPrescribed(drug.id);
+                          const drugClasses = getDrugClasses(drug);
+
+                          return (
+                            <button
+                              key={drug.id}
+                              onClick={() => setSelectedDrug(drug)}
+                              className={`w-full px-4 py-3 text-left transition-colors ${
+                                isSelected ? 'bg-[#F0FDFA]' : 'hover:bg-slate-50'
+                              }`}
+                            >
+                              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="min-w-0">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <span className="text-sm font-bold text-[#0F2942]">
+                                      {drug.brandName}
+                                    </span>
+                                    <span className="truncate text-xs font-semibold text-[#0D9488]">
+                                      {drug.dci}
+                                    </span>
+                                    {inPrescription && (
+                                      <span
+                                        className="h-1.5 w-1.5 rounded-full bg-teal-500"
+                                        title="Sur le plateau de prescription"
+                                      />
+                                    )}
+                                  </div>
+                                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-slate-500">
+                                    <span>{drug.presentationForm}</span>
+                                    <span aria-hidden="true">·</span>
+                                    <span>{drug.standardPackaging}</span>
+                                  </div>
+                                </div>
+
+                                <div className="flex flex-wrap items-center gap-1.5 sm:justify-end">
+                                  {drugClasses.length === 0 ? (
+                                    <span className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">
+                                      Non classé
+                                    </span>
+                                  ) : (
+                                    drugClasses.map((pharmacologicalClass) => (
+                                      <span
+                                        key={pharmacologicalClass}
+                                        className="rounded border border-teal-200 bg-teal-50 px-1.5 py-0.5 text-[10px] font-semibold text-teal-800"
+                                      >
+                                        {pharmacologicalClass}
+                                      </span>
+                                    ))
+                                  )}
+                                </div>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
 
                     {/* Master Monograph Card Container */}

@@ -22,6 +22,8 @@ export interface DrugMonograph {
   atcCode: string;
   atcClassification: string;
   specialty: string;
+  specialties?: string[];
+  pharmacologicalClasses?: string[];
   regulatoryStatus: 'Liste I' | 'Liste II' | 'Stupéfiant' | 'Non listé (Sans ordonnance)';
   holderLaboratory: string;
   originCountry: string;

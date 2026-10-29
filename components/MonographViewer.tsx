@@ -16,6 +16,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { DrugMonograph } from '../lib/pharmacopoeia-data';
+import { getDrugClasses, getDrugSpecialties } from '../lib/medical-classification';
 
 interface MonographViewerProps {
   drug: DrugMonograph;
@@ -40,6 +41,9 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
         (r) => patientClearance >= r.creatinineClearanceMin && patientClearance <= r.creatinineClearanceMax
       )
     : null;
+
+  const drugSpecialties = getDrugSpecialties(drug);
+  const drugClasses = getDrugClasses(drug);
 
   return (
     <article className="bg-white border border-[#E2E8F0] rounded-xl shadow-xs overflow-hidden">
@@ -87,6 +91,27 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
               <span aria-hidden="true">·</span>
               <span>Origine : {drug.originCountry}</span>
             </div>
+
+            {(drugSpecialties.length > 0 || drugClasses.length > 0) && (
+              <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                {drugSpecialties.map((specialty) => (
+                  <span
+                    key={specialty}
+                    className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-600"
+                  >
+                    {specialty}
+                  </span>
+                ))}
+                {drugClasses.map((pharmacologicalClass) => (
+                  <span
+                    key={pharmacologicalClass}
+                    className="rounded border border-teal-200 bg-teal-50 px-1.5 py-0.5 text-[10px] font-semibold text-teal-800"
+                  >
+                    {pharmacologicalClass}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Action CTAs */}

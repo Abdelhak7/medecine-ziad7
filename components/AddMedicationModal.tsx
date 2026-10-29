@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Stethoscope, Trash2, X } from 'lucide-react';
 import { DrugMonograph, RenalRule } from '../lib/pharmacopoeia-data';
+import { getPharmacologicalClassNames } from '../lib/medical-classification';
 
 interface AddMedicationModalProps {
   isOpen: boolean;
@@ -25,6 +26,8 @@ interface MedicationForm {
   atcCode: string;
   atcClassification: string;
   specialty: string;
+  specialties: string[];
+  pharmacologicalClasses: string[];
   regulatoryStatus: DrugMonograph['regulatoryStatus'];
   holderLaboratory: string;
   originCountry: string;
@@ -86,6 +89,8 @@ const severityOptions: RenalRule['severity'][] = [
   'CONTRAINDICATED',
 ];
 
+const pharmacologicalClassOptions = getPharmacologicalClassNames();
+
 const inputClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 outline-none transition-colors focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20';
 const labelClass = 'block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1';
@@ -106,6 +111,8 @@ const createInitialForm = (): MedicationForm => ({
   atcCode: '',
   atcClassification: '',
   specialty: '',
+  specialties: [],
+  pharmacologicalClasses: [],
   regulatoryStatus: 'Liste I',
   holderLaboratory: '',
   originCountry: 'Algérie',
@@ -244,6 +251,9 @@ export const AddMedicationModal: React.FC<AddMedicationModalProps> = ({
     }));
 
     const parsedRate = Number.parseInt(form.cnasRatePercent, 10);
+    const associatedSpecialties = Array.from(
+      new Set([specialty, ...form.specialties].map((item) => item.trim()).filter(Boolean))
+    );
 
     const newDrug: DrugMonograph = {
       id: `${slugify(brandName) || 'medicament'}-${Date.now().toString(36)}`,
@@ -252,6 +262,8 @@ export const AddMedicationModal: React.FC<AddMedicationModalProps> = ({
       atcCode: form.atcCode.trim() || 'Non renseigné',
       atcClassification: form.atcClassification.trim() || 'Non classé',
       specialty,
+      specialties: associatedSpecialties,
+      pharmacologicalClasses: form.pharmacologicalClasses,
       regulatoryStatus: form.regulatoryStatus,
       holderLaboratory: form.holderLaboratory.trim() || 'Non renseigné',
       originCountry: form.originCountry.trim() || 'Non renseigné',
@@ -479,6 +491,61 @@ export const AddMedicationModal: React.FC<AddMedicationModalProps> = ({
                           <option key={specialty} value={specialty} />
                         ))}
                       </datalist>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className={labelClass} htmlFor="associatedSpecialties">
+                        Spécialités associées
+                      </label>
+                      <select
+                        id="associatedSpecialties"
+                        multiple
+                        size={5}
+                        value={form.specialties}
+                        onChange={(event) =>
+                          updateField(
+                            'specialties',
+                            Array.from(event.target.selectedOptions, (option) => option.value)
+                          )
+                        }
+                        className={`${inputClass} min-h-28`}
+                      >
+                        {availableSpecialties.map((specialty) => (
+                          <option key={specialty} value={specialty}>
+                            {specialty}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="mt-1 text-[10px] text-slate-500">
+                        La spécialité principale est toujours conservée. Utilisez Ctrl/Cmd pour
+                        sélectionner plusieurs spécialités.
+                      </p>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className={labelClass} htmlFor="pharmacologicalClasses">
+                        Classes pharmacologiques
+                      </label>
+                      <select
+                        id="pharmacologicalClasses"
+                        multiple
+                        size={6}
+                        value={form.pharmacologicalClasses}
+                        onChange={(event) =>
+                          updateField(
+                            'pharmacologicalClasses',
+                            Array.from(event.target.selectedOptions, (option) => option.value)
+                          )
+                        }
+                        className={`${inputClass} min-h-32`}
+                      >
+                        {pharmacologicalClassOptions.map((pharmacologicalClass) => (
+                          <option key={pharmacologicalClass} value={pharmacologicalClass}>
+                            {pharmacologicalClass}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="mt-1 text-[10px] text-slate-500">
+                        Un médicament peut appartenir à plusieurs classes thérapeutiques.
+                      </p>
                     </div>
                     <div>
                       <label className={labelClass} htmlFor="regulatoryStatus">

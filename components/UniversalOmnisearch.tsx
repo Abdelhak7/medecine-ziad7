@@ -3,6 +3,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Check, AlertCircle, ArrowRight } from 'lucide-react';
 import { DrugMonograph } from '../lib/pharmacopoeia-data';
+import {
+  getDrugClasses,
+  getDrugSpecialties,
+  matchesDrugQuery,
+} from '../lib/medical-classification';
 
 interface UniversalOmnisearchProps {
   drugs: DrugMonograph[];
@@ -10,6 +15,7 @@ interface UniversalOmnisearchProps {
   onSelectDrug: (drug: DrugMonograph) => void;
   onPrescribeQuick: (drug: DrugMonograph) => void;
   isPrescribed: (drugId: string) => boolean;
+  onQueryChange?: (query: string) => void;
 }
 
 export const UniversalOmnisearch: React.FC<UniversalOmnisearchProps> = ({
@@ -18,6 +24,7 @@ export const UniversalOmnisearch: React.FC<UniversalOmnisearchProps> = ({
   onSelectDrug,
   onPrescribeQuick,
   isPrescribed,
+  onQueryChange,
 }) => {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -41,18 +48,8 @@ export const UniversalOmnisearch: React.FC<UniversalOmnisearchProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Filter drugs based on query: brand name, DCI, ATC code, ATC classification, or specialty
-  const filteredDrugs = drugs.filter((drug) => {
-    if (!query.trim()) return true;
-    const q = query.toLowerCase().trim();
-    return (
-      drug.brandName.toLowerCase().includes(q) ||
-      drug.dci.toLowerCase().includes(q) ||
-      drug.atcCode.toLowerCase().includes(q) ||
-      drug.atcClassification.toLowerCase().includes(q) ||
-      drug.specialty.toLowerCase().includes(q)
-    );
-  });
+  // Filter drugs by brand, DCI, ATC, specialty, or pharmacological class.
+  const filteredDrugs = drugs.filter((drug) => matchesDrugQuery(drug, query));
 
   const handleSelect = (drug: DrugMonograph) => {
     onSelectDrug(drug);
@@ -106,6 +103,7 @@ export const UniversalOmnisearch: React.FC<UniversalOmnisearchProps> = ({
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
+            onQueryChange?.(e.target.value);
             setIsOpen(true);
             setHighlightIndex(0);
           }}
@@ -120,6 +118,7 @@ export const UniversalOmnisearch: React.FC<UniversalOmnisearchProps> = ({
             <button
               onClick={() => {
                 setQuery('');
+                onQueryChange?.('');
                 inputRef.current?.focus();
               }}
               className="p-1 text-slate-400 hover:text-slate-600 rounded transition-colors"
@@ -179,10 +178,18 @@ export const UniversalOmnisearch: React.FC<UniversalOmnisearchProps> = ({
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 mt-0.5">
                         <span>{drug.presentationForm}</span>
                         <span aria-hidden="true">·</span>
-                        <span className="text-slate-600 font-medium">{drug.holderLaboratory}</span>
+                        <span>{getDrugSpecialties(drug).slice(0, 2).join(', ')}</span>
+                        {getDrugClasses(drug).slice(0, 1).map((pharmacologicalClass) => (
+                          <span
+                            key={pharmacologicalClass}
+                            className="rounded bg-teal-50 px-1.5 py-0.5 text-[10px] font-semibold text-teal-800"
+                          >
+                            {pharmacologicalClass}
+                          </span>
+                        ))}
                       </div>
                     </div>
 
