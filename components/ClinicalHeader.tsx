@@ -1,38 +1,23 @@
 'use client';
 
 import React from 'react';
-import { ShieldAlert, AlertTriangle, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 interface ClinicalHeaderProps {
-  currentTab: 'monographs' | 'emergency';
-  onTabChange: (tab: 'monographs' | 'emergency') => void;
-  prescribedCount: number;
-  hasContraindication: boolean;
-  onOpenPrescriptionTray: () => void;
   onOpenAddModal: () => void;
 }
 
-export const ClinicalHeader: React.FC<ClinicalHeaderProps> = ({
-  currentTab,
-  onTabChange,
-  prescribedCount,
-  hasContraindication,
-  onOpenPrescriptionTray,
-  onOpenAddModal,
-}) => {
+export const ClinicalHeader: React.FC<ClinicalHeaderProps> = ({ onOpenAddModal }) => {
   return (
     <header className="sticky top-0 z-40 bg-[#0F2942] text-white border-b border-[#1E3A5F]">
-      <div className="max-w-[1720px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-8">
-        {/* Zone 1: Brand Wordmark (Single text element wordmark as per Top Bar Contract) */}
-        <div className="flex items-center gap-3 shrink-0">
-          <button
-            onClick={() => onTabChange('monographs')}
-            className="flex items-center gap-2.5 text-left focus:outline-none"
-          >
-            <div className="w-8 h-8 rounded bg-[#0D9488] flex items-center justify-center text-white font-bold text-sm shadow-sm">
+      <div className="max-w-[1720px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3 sm:gap-8">
+        {/* Zone 1: Brand Wordmark */}
+        <div className="flex items-center gap-3 shrink-0 min-w-0">
+          <div className="flex items-center gap-2.5 text-left">
+            <div className="w-8 h-8 rounded bg-[#0D9488] flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0">
               DZ
             </div>
-            <div className="leading-tight">
+            <div className="leading-tight min-w-0">
               <span className="text-lg font-bold tracking-tight text-white whitespace-nowrap">
                 PharmaDZ Clinical
               </span>
@@ -40,34 +25,17 @@ export const ClinicalHeader: React.FC<ClinicalHeaderProps> = ({
                 Pharmacopée & Sécurité Thérapeutique
               </span>
             </div>
-          </button>
+          </div>
         </div>
 
-        {/* Zone 2: Single-line clean text navigation links */}
+        {/* Zone 2: Single active navigation item */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <button
-            onClick={() => onTabChange('monographs')}
-            className={`whitespace-nowrap shrink-0 transition-colors py-1 border-b-2 text-xs uppercase tracking-wider ${
-              currentTab === 'monographs'
-                ? 'text-[#86F2E4] border-[#0D9488] font-semibold'
-                : 'text-slate-300 border-transparent hover:text-white'
-            }`}
-          >
+          <span className="whitespace-nowrap shrink-0 py-1 border-b-2 border-[#0D9488] text-xs uppercase tracking-wider text-[#86F2E4] font-semibold">
             Monographies & Recherche
-          </button>
-          <button
-            onClick={() => onTabChange('emergency')}
-            className={`whitespace-nowrap shrink-0 transition-colors py-1 border-b-2 text-xs uppercase tracking-wider ${
-              currentTab === 'emergency'
-                ? 'text-[#86F2E4] border-[#0D9488] font-semibold'
-                : 'text-slate-300 border-transparent hover:text-white'
-            }`}
-          >
-            Protocoles d&apos;Urgence
-          </button>
+          </span>
         </nav>
 
-        {/* Zone 3: primary actions */}
+        {/* Zone 3: primary action */}
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={onOpenAddModal}
@@ -77,49 +45,14 @@ export const ClinicalHeader: React.FC<ClinicalHeaderProps> = ({
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">Ajouter</span>
           </button>
-          <button
-            onClick={onOpenPrescriptionTray}
-            className={`flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded transition-all whitespace-nowrap shrink-0 ${
-              hasContraindication
-                ? 'bg-[#DC2626] hover:bg-[#B91C1C] text-white animate-pulse'
-                : prescribedCount > 0
-                ? 'bg-[#0D9488] hover:bg-[#0F766E] text-white'
-                : 'bg-[#1E3A5F] hover:bg-[#2B4C74] text-slate-200'
-            }`}
-          >
-            {hasContraindication ? (
-              <AlertTriangle className="w-4 h-4 text-white" />
-            ) : (
-              <ShieldAlert className="w-4 h-4" />
-            )}
-            <span>Plateau Prescription ({prescribedCount})</span>
-            {hasContraindication && (
-              <span className="bg-white text-[#DC2626] font-bold text-[10px] px-1.5 py-0.5 rounded-full ml-0.5">
-                Alerte
-              </span>
-            )}
-          </button>
         </div>
       </div>
 
-      {/* Mobile nav bar */}
+      {/* Mobile nav bar: single active section */}
       <div className="md:hidden flex items-center justify-between px-3 py-2 bg-[#0A1D30] border-t border-[#1E3A5F] overflow-x-auto text-xs">
-        <button
-          onClick={() => onTabChange('monographs')}
-          className={`px-2.5 py-1 whitespace-nowrap rounded ${
-            currentTab === 'monographs' ? 'bg-[#0D9488] text-white font-medium' : 'text-slate-300'
-          }`}
-        >
+        <span className="px-2.5 py-1 whitespace-nowrap rounded bg-[#0D9488] text-white font-medium">
           Monographies
-        </button>
-        <button
-          onClick={() => onTabChange('emergency')}
-          className={`px-2.5 py-1 whitespace-nowrap rounded ${
-            currentTab === 'emergency' ? 'bg-[#0D9488] text-white font-medium' : 'text-slate-300'
-          }`}
-        >
-          Urgences
-        </button>
+        </span>
       </div>
     </header>
   );

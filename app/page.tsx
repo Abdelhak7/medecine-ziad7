@@ -1,30 +1,44 @@
 'use client';
 
-import React, { useState, useMemo, useSyncExternalStore } from 'react';
-import { 
-  ALGERIAN_DRUG_DATABASE, 
-  DrugMonograph 
+import React, { useMemo, useState, useSyncExternalStore } from 'react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  FileText,
+  Layers,
+  Menu,
+  Pill,
+  Stethoscope,
+  X,
+} from 'lucide-react';
+import {
+  ALGERIAN_DRUG_DATABASE,
+  DrugMonograph,
 } from '../lib/pharmacopoeia-data';
-import { 
-  PatientParameters, 
-  evaluatePatientRenalState 
+import {
+  PatientParameters,
+  evaluatePatientRenalState,
 } from '../lib/renal-calculator';
-import { 
-  analyzePrescription 
-} from '../lib/prescription-checker';
 import {
   getDrugClasses,
   getDrugSpecialties,
   getPharmacologicalClassNames,
-  getSpecialtyNames,
-  matchesDrugQuery,
+  MEDICAL_SPECIALTIES,
+  MedicalSpecialty,
+  normalizeSearchText,
 } from '../lib/medical-classification';
+import {
+  getPathologiesForSpecialty,
+  getPathologyMedications,
+  PATHOLOGY_DATABASE,
+  Pathology,
+} from '../lib/pathology-data';
 import { ClinicalHeader } from '../components/ClinicalHeader';
 import { UniversalOmnisearch } from '../components/UniversalOmnisearch';
 import { SpecialtySidebar } from '../components/SpecialtySidebar';
 import { MonographViewer } from '../components/MonographViewer';
-import { InteractionScreeningDrawer } from '../components/InteractionScreeningDrawer';
-import { EmergencyProtocolsScreen } from '../components/EmergencyProtocolsScreen';
+import { PathologyViewer } from '../components/PathologyViewer';
+import { MedicationCardList } from '../components/MedicationCardList';
 import { RenalModalDrawer } from '../components/RenalModalDrawer';
 import { AddMedicationModal } from '../components/AddMedicationModal';
 import {
@@ -34,17 +48,19 @@ import {
   subscribeCustomPharmacopoeia,
 } from '../lib/custom-pharmacopoeia-store';
 
+type BrowseMode = 'dashboard' | 'pathologies' | 'medications';
+
 export default function ClinicalApp() {
-  // Navigation tabs: 'monographs' | 'emergency'
-  const [currentTab, setCurrentTab] = useState<'monographs' | 'emergency'>('monographs');
-
-  // Currently selected drug for the monograph viewer
-  const [selectedDrug, setSelectedDrug] = useState<DrugMonograph>(ALGERIAN_DRUG_DATABASE[0]);
-
-  // Sidebar filters
-  const [selectedSpecialty, setSelectedSpecialty] = useState<string>('Toutes');
-  const [selectedClass, setSelectedClass] = useState<string>('Toutes');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [browseMode, setBrowseMode] = useState<BrowseMode>('dashboard');
+  const [selectedSpecialtyId, setSelectedSpecialtyId] = useState<string | null>(
+    null
+  );
+  const [selectedPathologyId, setSelectedPathologyId] = useState<string | null>(
+    null
+  );
+  const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  const [selectedDrug, setSelectedDrug] = useState<DrugMonograph | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const customData = useSyncExternalStore(
     subscribeCustomPharmacopoeia,
@@ -55,16 +71,11 @@ export default function ClinicalApp() {
   const customSpecialties = customData.specialties;
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const drugs = useMemo(() => [...ALGERIAN_DRUG_DATABASE, ...customDrugs], [customDrugs]);
+  const drugs = useMemo(
+    () => [...ALGERIAN_DRUG_DATABASE, ...customDrugs],
+    [customDrugs]
+  );
 
-  // Active patient prescription basket
-  // Initialize with a realistic emergency duo: Lovenox + Kardegic to showcase interaction safety checking immediately
-  const [prescribedDrugs, setPrescribedDrugs] = useState<DrugMonograph[]>([
-    ALGERIAN_DRUG_DATABASE[0], // Lovenox
-    ALGERIAN_DRUG_DATABASE[1], // Kardegic
-  ]);
-
-  // Patient parameters for renal clearance
   const [patientParams, setPatientParams] = useState<PatientParameters>({
     gender: 'homme',
     age: 72,
@@ -72,28 +83,33 @@ export default function ClinicalApp() {
     creatinineValue: 125,
     creatinineUnit: 'umol_l',
   });
-
-  // Modal drawer for renal calculator
   const [isRenalModalOpen, setIsRenalModalOpen] = useState(false);
-  // Mobile drawer for prescription tray
-  const [isMobileTrayOpen, setIsMobileTrayOpen] = useState(false);
 
-  // Unique list of specialties: canonical taxonomy plus user-created entries.
-  const specialties = useMemo(() => {
-    const merged = getSpecialtyNames();
+  const specialties = useMemo<MedicalSpecialty[]>(() => {
+    const merged = [...MEDICAL_SPECIALTIES];
+    const knownNames = new Set(
+      merged.map((specialty) => normalizeSearchText(specialty.name))
+    );
     const additions = [
       ...customSpecialties,
       ...customDrugs.flatMap((drug) => getDrugSpecialties(drug)),
+      ...customDrugs.map((drug) => drug.specialty),
     ];
-    for (const specialty of additions) {
-      if (specialty && !merged.includes(specialty)) {
-        merged.push(specialty);
+
+    for (const name of additions) {
+      const normalizedName = normalizeSearchText(name);
+      if (name && !knownNames.has(normalizedName)) {
+        knownNames.add(normalizedName);
+        merged.push({
+          id: `custom-${normalizedName.replace(/[^a-z0-9]+/g, '-')}`,
+          name,
+        });
       }
     }
-    return ['Toutes', ...merged];
+
+    return merged;
   }, [customSpecialties, customDrugs]);
 
-  // Canonical pharmacological classes plus user-created classifications.
   const pharmacologicalClasses = useMemo(() => {
     const merged = getPharmacologicalClassNames();
     for (const drug of customDrugs) {
@@ -103,65 +119,113 @@ export default function ClinicalApp() {
         }
       }
     }
-    return ['Toutes', ...merged];
+    return merged;
   }, [customDrugs]);
 
-  // Filtered drugs based on specialty, class, and indexed search.
-  const filteredDrugs = useMemo(() => {
-    return drugs.filter((drug) => {
-      const matchSpecialty =
-        selectedSpecialty === 'Toutes' ||
-        getDrugSpecialties(drug).includes(selectedSpecialty);
-      const matchClass =
-        selectedClass === 'Toutes' || getDrugClasses(drug).includes(selectedClass);
-      return matchSpecialty && matchClass && matchesDrugQuery(drug, searchQuery);
-    });
-  }, [drugs, searchQuery, selectedClass, selectedSpecialty]);
+  const selectedSpecialty = useMemo(
+    () => specialties.find((specialty) => specialty.id === selectedSpecialtyId) ?? null,
+    [selectedSpecialtyId, specialties]
+  );
+  const selectedPathology = useMemo(
+    () =>
+      PATHOLOGY_DATABASE.find(
+        (pathology) => pathology.id === selectedPathologyId
+      ) ?? null,
+    [selectedPathologyId]
+  );
+  const specialtyPathologies = useMemo(
+    () =>
+      selectedSpecialtyId
+        ? getPathologiesForSpecialty(selectedSpecialtyId)
+        : [],
+    [selectedSpecialtyId]
+  );
+  const classMedications = useMemo(
+    () =>
+      selectedClass
+        ? drugs.filter((drug) =>
+            getDrugClasses(drug).includes(selectedClass)
+          )
+        : [],
+    [drugs, selectedClass]
+  );
 
-  // Evaluate renal state
-  const renalState = useMemo(() => {
-    return evaluatePatientRenalState(patientParams, drugs);
-  }, [patientParams, drugs]);
-
-  // Analyze active prescription
-  const prescriptionAnalysis = useMemo(() => {
-    return analyzePrescription(
-      prescribedDrugs.map((drug) => ({ drug })),
-      renalState.cockcroftClearanceMlMin
-    );
-  }, [prescribedDrugs, renalState.cockcroftClearanceMlMin]);
-
-  // Toggle drug in prescription basket
-  const handleTogglePrescription = (drug: DrugMonograph) => {
-    setPrescribedDrugs((prev) => {
-      const exists = prev.some((d) => d.id === drug.id);
-      if (exists) {
-        return prev.filter((d) => d.id !== drug.id);
-      } else {
-        return [...prev, drug];
+  const pathologyCountBySpecialty = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const pathology of PATHOLOGY_DATABASE) {
+      for (const specialtyId of pathology.specialtyIds) {
+        counts.set(specialtyId, (counts.get(specialtyId) ?? 0) + 1);
       }
-    });
+    }
+    return counts;
+  }, []);
+
+  const classCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const pharmacologicalClass of pharmacologicalClasses) {
+      counts.set(
+        pharmacologicalClass,
+        drugs.filter((drug) =>
+          getDrugClasses(drug).includes(pharmacologicalClass)
+        ).length
+      );
+    }
+    return counts;
+  }, [drugs, pharmacologicalClasses]);
+
+  const renalState = useMemo(
+    () => evaluatePatientRenalState(patientParams, drugs),
+    [patientParams, drugs]
+  );
+
+  const closeSidebar = () => setIsSidebarOpen(false);
+
+  const handleSelectSpecialty = (specialtyId: string) => {
+    setBrowseMode('pathologies');
+    setSelectedSpecialtyId(specialtyId);
+    setSelectedPathologyId(null);
+    setSelectedClass(null);
+    setSelectedDrug(null);
+    closeSidebar();
   };
 
-  const handleRemoveDrug = (drugId: string) => {
-    setPrescribedDrugs((prev) => prev.filter((d) => d.id !== drugId));
+  const handleSelectPathology = (pathology: Pathology) => {
+    setBrowseMode('pathologies');
+    setSelectedSpecialtyId(pathology.specialtyIds[0] ?? null);
+    setSelectedPathologyId(pathology.id);
+    setSelectedClass(null);
+    setSelectedDrug(null);
+    closeSidebar();
   };
 
-  const handleClearPrescription = () => {
-    setPrescribedDrugs([]);
+  const handleSelectClass = (pharmacologicalClass: string) => {
+    setBrowseMode('medications');
+    setSelectedClass(pharmacologicalClass);
+    setSelectedSpecialtyId(null);
+    setSelectedPathologyId(null);
+    setSelectedDrug(null);
+    closeSidebar();
   };
 
-  const handleLoadProtocolDrugs = (drugs: DrugMonograph[]) => {
-    setPrescribedDrugs((prev) => {
-      const existingIds = new Set(prev.map((d) => d.id));
-      const newItems = drugs.filter((d) => !existingIds.has(d.id));
-      return [...prev, ...newItems];
-    });
-    setIsMobileTrayOpen(true);
+  const handleSelectDrug = (drug: DrugMonograph) => {
+    setSelectedDrug(drug);
+    closeSidebar();
   };
 
-  const isDrugPrescribed = (drugId: string) => {
-    return prescribedDrugs.some((d) => d.id === drugId);
+  const openPathologyBrowser = () => {
+    setBrowseMode('pathologies');
+    setSelectedSpecialtyId(null);
+    setSelectedPathologyId(null);
+    setSelectedClass(null);
+    setSelectedDrug(null);
+  };
+
+  const openMedicationBrowser = () => {
+    setBrowseMode('medications');
+    setSelectedSpecialtyId(null);
+    setSelectedPathologyId(null);
+    setSelectedClass(null);
+    setSelectedDrug(null);
   };
 
   const handleAddDrug = (drug: DrugMonograph) => {
@@ -172,11 +236,11 @@ export default function ClinicalApp() {
       ? customSpecialties
       : [...customSpecialties, drug.specialty];
     saveCustomPharmacopoeia({ drugs: nextDrugs, specialties: nextSpecialties });
+    setBrowseMode('dashboard');
+    setSelectedSpecialtyId(null);
+    setSelectedPathologyId(null);
+    setSelectedClass(null);
     setSelectedDrug(drug);
-    setSelectedSpecialty(drug.specialty);
-    setSelectedClass('Toutes');
-    setSearchQuery('');
-    setCurrentTab('monographs');
   };
 
   const handleAddSpecialty = (specialty: string) => {
@@ -186,258 +250,513 @@ export default function ClinicalApp() {
         specialties: [...customSpecialties, specialty],
       });
     }
-    setSelectedSpecialty(specialty);
-    setCurrentTab('monographs');
+    setBrowseMode('pathologies');
+    setSelectedSpecialtyId(null);
+    setSelectedPathologyId(null);
+    setSelectedClass(null);
+    setSelectedDrug(null);
   };
 
-  const handleSelectSpecialty = (specialty: string) => {
-    setSelectedSpecialty(specialty);
-    const firstDrug = drugs.find(
-      (drug) =>
-        (specialty === 'Toutes' || getDrugSpecialties(drug).includes(specialty)) &&
-        (selectedClass === 'Toutes' || getDrugClasses(drug).includes(selectedClass)) &&
-        matchesDrugQuery(drug, searchQuery)
-    );
-    if (firstDrug) {
-      setSelectedDrug(firstDrug);
-    }
-  };
+  const backLabel = selectedPathology
+    ? `Retour à ${selectedPathology.name}`
+    : selectedClass
+    ? `Retour à ${selectedClass}`
+    : selectedSpecialty
+    ? `Retour à ${selectedSpecialty.name}`
+    : 'Retour au tableau de bord';
 
-  const handleSelectClass = (pharmacologicalClass: string) => {
-    setSelectedClass(pharmacologicalClass);
-    const firstDrug = drugs.find(
-      (drug) =>
-        (selectedSpecialty === 'Toutes' ||
-          getDrugSpecialties(drug).includes(selectedSpecialty)) &&
-        (pharmacologicalClass === 'Toutes' ||
-          getDrugClasses(drug).includes(pharmacologicalClass)) &&
-        matchesDrugQuery(drug, searchQuery)
-    );
-    if (firstDrug) {
-      setSelectedDrug(firstDrug);
+  const renderContent = () => {
+    if (selectedDrug) {
+      return (
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={() => setSelectedDrug(null)}
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 transition-colors hover:text-[#0D9488]"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            {backLabel}
+          </button>
+          <MonographViewer
+            drug={selectedDrug}
+            onOpenRenalCalculator={() => setIsRenalModalOpen(true)}
+            patientClearance={renalState.cockcroftClearanceMlMin}
+          />
+        </div>
+      );
     }
+
+    if (selectedPathology) {
+      return (
+        <PathologyViewer
+          pathology={selectedPathology}
+          drugs={drugs}
+          specialties={specialties}
+          onSelectDrug={handleSelectDrug}
+          onBack={() => setSelectedPathologyId(null)}
+        />
+      );
+    }
+
+    if (selectedSpecialty) {
+      return (
+        <div className="space-y-4">
+          <button
+            type="button"
+            onClick={() => setSelectedSpecialtyId(null)}
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 transition-colors hover:text-[#0D9488]"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Toutes les spécialités
+          </button>
+
+          <section className="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#0D9488]">
+                  Spécialité médicale
+                </p>
+                <h1 className="mt-1 text-xl font-bold tracking-tight text-[#0F2942]">
+                  {selectedSpecialty.name}
+                </h1>
+                <p className="mt-2 text-xs text-slate-500">
+                  Pathologies disposant de données vérifiées dans la base actuelle.
+                </p>
+              </div>
+              <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                {specialtyPathologies.length} pathologie
+                {specialtyPathologies.length > 1 ? 's' : ''}
+              </span>
+            </div>
+          </section>
+
+          {specialtyPathologies.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
+              <FileText className="mx-auto mb-2 h-5 w-5 text-slate-400" />
+              <p className="text-sm font-semibold text-[#0F2942]">
+                Aucune pathologie vérifiée disponible pour cette spécialité.
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                Les pathologies ne sont affichées que lorsqu’elles sont appuyées par
+                les données existantes de la pharmacopée.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {specialtyPathologies.map((pathology) => {
+                const medications = getPathologyMedications(pathology, drugs);
+                const classes = Array.from(
+                  new Set(medications.flatMap((drug) => getDrugClasses(drug)))
+                );
+
+                return (
+                  <button
+                    key={pathology.id}
+                    type="button"
+                    onClick={() => handleSelectPathology(pathology)}
+                    className="group rounded-xl border border-[#E2E8F0] bg-white p-4 text-left shadow-xs transition-colors hover:border-teal-300 hover:bg-teal-50/30"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="rounded border border-slate-200 bg-slate-50 p-1.5 text-[#0D9488]">
+                        <FileText className="h-3.5 w-3.5" />
+                      </span>
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[10px] text-slate-500">
+                        {medications.length} médicament
+                        {medications.length > 1 ? 's' : ''}
+                      </span>
+                    </div>
+                    <h2 className="mt-2 text-sm font-bold text-[#0F2942]">
+                      {pathology.name}
+                    </h2>
+                    <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-slate-500">
+                      {pathology.description}
+                    </p>
+                    {classes.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {classes.map((pharmacologicalClass) => (
+                          <span
+                            key={pharmacologicalClass}
+                            className="rounded border border-teal-200 bg-teal-50 px-1.5 py-0.5 text-[9px] font-semibold text-teal-800"
+                          >
+                            {pharmacologicalClass}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <span className="mt-3 flex items-center gap-1 text-[11px] font-semibold text-[#0D9488]">
+                      Consulter
+                      <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    if (selectedClass) {
+      return (
+        <div className="space-y-4">
+          <button
+            type="button"
+            onClick={() => setSelectedClass(null)}
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 transition-colors hover:text-[#0D9488]"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Toutes les classes pharmacologiques
+          </button>
+
+          <section className="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#0D9488]">
+                  Classe pharmacologique
+                </p>
+                <h1 className="mt-1 text-xl font-bold tracking-tight text-[#0F2942]">
+                  {selectedClass}
+                </h1>
+                <p className="mt-2 text-xs text-slate-500">
+                  Médicaments associés à cette classe dans la base de données.
+                </p>
+              </div>
+              <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                {classMedications.length} médicament
+                {classMedications.length > 1 ? 's' : ''}
+              </span>
+            </div>
+          </section>
+
+          <MedicationCardList
+            drugs={classMedications}
+            onSelectDrug={handleSelectDrug}
+            emptyMessage={`Aucun médicament référencé pour la classe « ${selectedClass} ».`}
+          />
+        </div>
+      );
+    }
+
+    if (browseMode === 'pathologies') {
+      return (
+        <div className="space-y-4">
+          <section className="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#0D9488]">
+              Navigation clinique
+            </p>
+            <h1 className="mt-1 text-xl font-bold tracking-tight text-[#0F2942]">
+              Pathologies par spécialité
+            </h1>
+            <p className="mt-2 text-xs text-slate-500">
+              Sélectionnez une spécialité pour afficher les pathologies vérifiées et
+              leurs médicaments associés.
+            </p>
+          </section>
+
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            {specialties.map((specialty) => {
+              const count = pathologyCountBySpecialty.get(specialty.id) ?? 0;
+              return (
+                <button
+                  key={specialty.id}
+                  type="button"
+                  onClick={() => handleSelectSpecialty(specialty.id)}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-white px-3.5 py-3 text-left shadow-xs transition-colors hover:border-teal-300 hover:bg-teal-50/30"
+                >
+                  <span className="flex min-w-0 items-center gap-2">
+                    <Stethoscope className="h-3.5 w-3.5 shrink-0 text-[#0D9488]" />
+                    <span className="truncate text-xs font-semibold text-[#0F2942]">
+                      {specialty.name}
+                    </span>
+                  </span>
+                  <span
+                    className={`shrink-0 rounded px-1.5 py-0.5 font-mono text-[10px] ${
+                      count > 0
+                        ? 'bg-slate-100 text-slate-600'
+                        : 'bg-slate-50 text-slate-400'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    if (browseMode === 'medications') {
+      return (
+        <div className="space-y-4">
+          <section className="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#0D9488]">
+              Navigation médicamenteuse
+            </p>
+            <h1 className="mt-1 text-xl font-bold tracking-tight text-[#0F2942]">
+              Médicaments par classe pharmacologique
+            </h1>
+            <p className="mt-2 text-xs text-slate-500">
+              Sélectionnez une classe pour afficher les médicaments qui y sont
+              rattachés sans duplication.
+            </p>
+          </section>
+
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            {pharmacologicalClasses.map((pharmacologicalClass) => {
+              const count = classCounts.get(pharmacologicalClass) ?? 0;
+              return (
+                <button
+                  key={pharmacologicalClass}
+                  type="button"
+                  onClick={() => handleSelectClass(pharmacologicalClass)}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-white px-3.5 py-3 text-left shadow-xs transition-colors hover:border-teal-300 hover:bg-teal-50/30"
+                >
+                  <span className="flex min-w-0 items-center gap-2">
+                    <Pill className="h-3.5 w-3.5 shrink-0 text-[#0D9488]" />
+                    <span className="truncate text-xs font-semibold text-[#0F2942]">
+                      {pharmacologicalClass}
+                    </span>
+                  </span>
+                  <span
+                    className={`shrink-0 rounded px-1.5 py-0.5 font-mono text-[10px] ${
+                      count > 0
+                        ? 'bg-slate-100 text-slate-600'
+                        : 'bg-slate-50 text-slate-400'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        <section className="rounded-xl border border-[#E2E8F0] bg-white p-6 shadow-xs">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[#0D9488]">
+            Exploration clinique
+          </p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-[#0F2942]">
+            Rechercher et consulter la pharmacopée
+          </h1>
+          <p className="mt-2 max-w-2xl text-xs leading-relaxed text-slate-500">
+            Deux parcours complémentaires : partir d’une pathologie et de sa
+            spécialité, ou partir d’une classe pharmacologique pour retrouver les
+            médicaments associés.
+          </p>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={openPathologyBrowser}
+              className="group rounded-xl border border-[#E2E8F0] bg-white p-4 text-left transition-colors hover:border-teal-300 hover:bg-teal-50/30"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <span className="rounded-lg border border-teal-100 bg-teal-50 p-2 text-[#0D9488]">
+                  <Stethoscope className="h-4 w-4" />
+                </span>
+                <ArrowRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-[#0D9488]" />
+              </div>
+              <h2 className="mt-3 text-sm font-bold text-[#0F2942]">
+                Pathologies par spécialité
+              </h2>
+              <p className="mt-1 text-[11px] text-slate-500">
+                {PATHOLOGY_DATABASE.length} pathologies vérifiées ·{' '}
+                {specialties.length} spécialités
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={openMedicationBrowser}
+              className="group rounded-xl border border-[#E2E8F0] bg-white p-4 text-left transition-colors hover:border-teal-300 hover:bg-teal-50/30"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <span className="rounded-lg border border-teal-100 bg-teal-50 p-2 text-[#0D9488]">
+                  <Pill className="h-4 w-4" />
+                </span>
+                <ArrowRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-[#0D9488]" />
+              </div>
+              <h2 className="mt-3 text-sm font-bold text-[#0F2942]">
+                Médicaments par classe pharmacologique
+              </h2>
+              <p className="mt-1 text-[11px] text-slate-500">
+                {pharmacologicalClasses.length} classes · {drugs.length} médicaments
+              </p>
+            </button>
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 gap-2 border-t border-slate-100 pt-4">
+            <div>
+              <p className="font-mono text-lg font-bold text-[#0F2942]">
+                {drugs.length}
+              </p>
+              <p className="text-[10px] uppercase tracking-wide text-slate-400">
+                Médicaments
+              </p>
+            </div>
+            <div>
+              <p className="font-mono text-lg font-bold text-[#0F2942]">
+                {PATHOLOGY_DATABASE.length}
+              </p>
+              <p className="text-[10px] uppercase tracking-wide text-slate-400">
+                Pathologies
+              </p>
+            </div>
+            <div>
+              <p className="font-mono text-lg font-bold text-[#0F2942]">
+                {pharmacologicalClasses.length}
+              </p>
+              <p className="text-[10px] uppercase tracking-wide text-slate-400">
+                Classes
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-[#F1F5F9] px-4 py-3 text-[11px] text-slate-600">
+          <Layers className="h-3.5 w-3.5 shrink-0 text-[#0D9488]" />
+          Les pathologies et associations affichées proviennent uniquement des
+          données vérifiées déjà présentes dans la pharmacopée.
+        </div>
+      </div>
+    );
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#191C1E] flex flex-col font-sans selection:bg-[#86F2E4] selection:text-[#00201D]">
-      {/* Clinical Header conforming to Top Bar Contract */}
-      <ClinicalHeader
-        currentTab={currentTab}
-        onTabChange={(tab) => {
-          setCurrentTab(tab);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        prescribedCount={prescribedDrugs.length}
-        hasContraindication={prescriptionAnalysis.hasAbsoluteContraindication}
-        onOpenPrescriptionTray={() => setIsMobileTrayOpen(true)}
-        onOpenAddModal={() => setIsAddModalOpen(true)}
-      />
+    <div className="flex min-h-screen flex-col bg-[#F8FAFC] font-sans text-[#191C1E] selection:bg-[#86F2E4] selection:text-[#00201D]">
+      <ClinicalHeader onOpenAddModal={() => setIsAddModalOpen(true)} />
 
-      {/* Main Workspace Frame */}
-      <main className="flex-1 max-w-[1720px] w-full mx-auto px-4 sm:px-6 py-6">
-        {/* VIEW 1: MONOGRAPHS & CLINICAL EXPLORER (3-COLUMN ARCHITECTURE AS PER DESIGN SPEC) */}
-        {currentTab === 'monographs' && (
-          <div className="space-y-6">
-            {/* Top Omnisearch Bar */}
-            <div className="max-w-4xl mx-auto w-full">
-              <UniversalOmnisearch
+      <main className="mx-auto w-full max-w-[1720px] flex-1 px-4 py-6 sm:px-6">
+        <div className="space-y-5">
+          <div className="mx-auto w-full max-w-4xl">
+            <UniversalOmnisearch
+              drugs={drugs}
+              pathologies={PATHOLOGY_DATABASE}
+              specialties={specialties}
+              classes={pharmacologicalClasses}
+              onSelectDrug={handleSelectDrug}
+              onSelectPathology={handleSelectPathology}
+              onSelectSpecialty={(specialty) =>
+                handleSelectSpecialty(specialty.id)
+              }
+              onSelectClass={handleSelectClass}
+            />
+          </div>
+
+          <div className="flex flex-col items-start gap-6 lg:flex-row">
+            <div className="hidden w-72 shrink-0 lg:sticky lg:top-20 lg:block">
+              <SpecialtySidebar
+                specialties={specialties}
+                pathologies={PATHOLOGY_DATABASE}
+                classes={pharmacologicalClasses}
                 drugs={drugs}
-                selectedDrug={selectedDrug}
-                onSelectDrug={(drug) => setSelectedDrug(drug)}
-                onPrescribeQuick={(drug) => handleTogglePrescription(drug)}
-                isPrescribed={isDrugPrescribed}
-                onQueryChange={setSearchQuery}
+                selectedSpecialtyId={selectedSpecialtyId}
+                selectedPathologyId={selectedPathologyId}
+                selectedClass={selectedClass}
+                onSelectSpecialty={handleSelectSpecialty}
+                onSelectPathology={handleSelectPathology}
+                onSelectClass={handleSelectClass}
+                onSelectDrug={handleSelectDrug}
               />
             </div>
 
-            {/* 3-Column Layout: Left Specialty Sidebar (w-64) | Center Monograph (flex-1) | Right Persistent Tray (w-80) */}
-            <div className="flex flex-col lg:flex-row gap-6 items-start">
-              {/* Column 1: Persistent Specialty & Pharmacological Class Navigation */}
-              <div className="w-full lg:w-auto">
-                <SpecialtySidebar
-                  specialties={specialties}
-                  classes={pharmacologicalClasses}
-                  selectedSpecialty={selectedSpecialty}
-                  selectedClass={selectedClass}
-                  onSelectSpecialty={handleSelectSpecialty}
-                  onSelectClass={handleSelectClass}
-                  drugs={drugs}
-                />
-              </div>
+            <div className="min-w-0 w-full flex-1 space-y-3">
+              <button
+                type="button"
+                onClick={() => setIsSidebarOpen(true)}
+                className="flex w-full items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-white px-3.5 py-2.5 text-left shadow-xs lg:hidden"
+              >
+                <span className="flex items-center gap-2 text-xs font-semibold text-[#0F2942]">
+                  <Menu className="h-4 w-4 text-[#0D9488]" />
+                  Parcourir les pathologies et les classes
+                </span>
+                <span className="font-mono text-[10px] text-slate-400">
+                  {PATHOLOGY_DATABASE.length} · {pharmacologicalClasses.length}
+                </span>
+              </button>
 
-              {/* Column 2: High-Speed Indexed Search & Monograph Viewer */}
-              <div className="flex-1 min-w-0 w-full space-y-4">
-                {filteredDrugs.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
-                    <p className="text-sm font-semibold text-[#0F2942]">
-                      Aucun médicament ne correspond aux filtres sélectionnés.
-                    </p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      Modifiez la spécialité, la classe ou la recherche, ou ajoutez une monographie.
-                    </p>
-                    <button
-                      onClick={() => setIsAddModalOpen(true)}
-                      className="mt-4 rounded-lg bg-[#0D9488] px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#0F766E]"
-                    >
-                      Ajouter un médicament
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    {/* Indexed medication rows with DCI, presentation and classification */}
-                    <div className="overflow-hidden rounded-xl border border-[#E2E8F0] bg-white shadow-xs">
-                      <div className="flex flex-col gap-1.5 border-b border-slate-100 bg-slate-50/70 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                          <span>Index des médicaments</span>
-                          <span className="font-mono text-slate-400">
-                            {filteredDrugs.length} résultat{filteredDrugs.length > 1 ? 's' : ''}
-                          </span>
-                        </div>
-                        {selectedClass !== 'Toutes' && (
-                          <button
-                            onClick={() => setSelectedClass('Toutes')}
-                            className="self-start rounded-full border border-teal-200 bg-teal-50 px-2.5 py-0.5 text-[10px] font-semibold text-teal-800 transition-colors hover:bg-teal-100 sm:self-auto"
-                            title="Retirer le filtre de classe"
-                          >
-                            Classe : {selectedClass} ×
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="max-h-72 divide-y divide-slate-100 overflow-y-auto">
-                        {filteredDrugs.map((drug) => {
-                          const isSelected = selectedDrug.id === drug.id;
-                          const inPrescription = isDrugPrescribed(drug.id);
-                          const drugClasses = getDrugClasses(drug);
-
-                          return (
-                            <button
-                              key={drug.id}
-                              onClick={() => setSelectedDrug(drug)}
-                              className={`w-full px-4 py-3 text-left transition-colors ${
-                                isSelected ? 'bg-[#F0FDFA]' : 'hover:bg-slate-50'
-                              }`}
-                            >
-                              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                                <div className="min-w-0">
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <span className="text-sm font-bold text-[#0F2942]">
-                                      {drug.brandName}
-                                    </span>
-                                    <span className="truncate text-xs font-semibold text-[#0D9488]">
-                                      {drug.dci}
-                                    </span>
-                                    {inPrescription && (
-                                      <span
-                                        className="h-1.5 w-1.5 rounded-full bg-teal-500"
-                                        title="Sur le plateau de prescription"
-                                      />
-                                    )}
-                                  </div>
-                                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-slate-500">
-                                    <span>{drug.presentationForm}</span>
-                                    <span aria-hidden="true">·</span>
-                                    <span>{drug.standardPackaging}</span>
-                                  </div>
-                                </div>
-
-                                <div className="flex flex-wrap items-center gap-1.5 sm:justify-end">
-                                  {drugClasses.length === 0 ? (
-                                    <span className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">
-                                      Non classé
-                                    </span>
-                                  ) : (
-                                    drugClasses.map((pharmacologicalClass) => (
-                                      <span
-                                        key={pharmacologicalClass}
-                                        className="rounded border border-teal-200 bg-teal-50 px-1.5 py-0.5 text-[10px] font-semibold text-teal-800"
-                                      >
-                                        {pharmacologicalClass}
-                                      </span>
-                                    ))
-                                  )}
-                                </div>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Master Monograph Card Container */}
-                    <MonographViewer
-                      drug={selectedDrug}
-                      isPrescribed={isDrugPrescribed(selectedDrug.id)}
-                      onTogglePrescription={handleTogglePrescription}
-                      onOpenRenalCalculator={() => setIsRenalModalOpen(true)}
-                      patientClearance={renalState.cockcroftClearanceMlMin}
-                    />
-                  </>
-                )}
-              </div>
-
+              {renderContent()}
             </div>
           </div>
-        )}
-
-        {/* VIEW 2: EMERGENCY HOSPITAL PROTOCOLS */}
-        {currentTab === 'emergency' && (
-          <EmergencyProtocolsScreen
-            onLoadProtocolToPrescription={handleLoadProtocolDrugs}
-            onSelectDrugForMonograph={(drug) => {
-              setSelectedDrug(drug);
-              setCurrentTab('monographs');
-            }}
-          />
-        )}
+        </div>
       </main>
 
-      {/* Floating Modal for Renal Calculator */}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <button
+            type="button"
+            aria-label="Fermer la navigation"
+            onClick={() => setIsSidebarOpen(false)}
+            className="absolute inset-0 bg-black/40"
+          />
+          <div className="absolute inset-y-0 left-0 w-[88%] max-w-sm overflow-y-auto bg-[#F8FAFC] p-4 shadow-2xl">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#0D9488]">
+                  Navigation
+                </p>
+                <p className="text-sm font-bold text-[#0F2942]">
+                  Pathologies & Médicaments
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsSidebarOpen(false)}
+                className="rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                aria-label="Fermer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <SpecialtySidebar
+              specialties={specialties}
+              pathologies={PATHOLOGY_DATABASE}
+              classes={pharmacologicalClasses}
+              drugs={drugs}
+              selectedSpecialtyId={selectedSpecialtyId}
+              selectedPathologyId={selectedPathologyId}
+              selectedClass={selectedClass}
+              onSelectSpecialty={handleSelectSpecialty}
+              onSelectPathology={handleSelectPathology}
+              onSelectClass={handleSelectClass}
+              onSelectDrug={handleSelectDrug}
+            />
+          </div>
+        </div>
+      )}
+
       <RenalModalDrawer
         isOpen={isRenalModalOpen}
         onClose={() => setIsRenalModalOpen(false)}
         params={patientParams}
-        onUpdateParams={(p) => setPatientParams(p)}
+        onUpdateParams={(params) => setPatientParams(params)}
       />
 
       {isAddModalOpen && (
         <AddMedicationModal
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
-          specialties={specialties}
+          specialties={specialties.map((specialty) => specialty.name)}
           onAddDrug={handleAddDrug}
           onAddSpecialty={handleAddSpecialty}
         />
       )}
 
-      {/* Mobile Slide-Over Drawer for Prescription Validation Tray */}
-      {isMobileTrayOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-xs">
-          <div className="w-full max-w-lg bg-white rounded-t-2xl sm:rounded-xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col">
-            <InteractionScreeningDrawer
-              prescribedDrugs={prescribedDrugs}
-              onRemoveDrug={handleRemoveDrug}
-              onClearPrescription={handleClearPrescription}
-              analysis={prescriptionAnalysis}
-              patientClearance={renalState.cockcroftClearanceMlMin}
-              onOpenRenalModal={() => {
-                setIsMobileTrayOpen(false);
-                setIsRenalModalOpen(true);
-              }}
-              onClose={() => setIsMobileTrayOpen(false)}
-              isMobileDrawer={true}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Clinical Footer */}
       <footer className="mt-auto border-t border-slate-200 bg-white py-6 text-xs text-slate-500">
-        <div className="max-w-[1720px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mx-auto flex max-w-[1720px] flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6">
           <div className="flex items-center gap-2">
             <span className="font-bold text-[#0F2942]">PharmaDZ Clinical</span>
             <span>·</span>
-            <span>Nomenclature Pharmaceutique & Règles de Bonnes Pratiques Thérapeutiques</span>
+            <span>
+              Nomenclature Pharmaceutique & Règles de Bonnes Pratiques
+              Thérapeutiques
+            </span>
           </div>
 
           <div className="flex items-center gap-4 text-[11px] text-slate-400">

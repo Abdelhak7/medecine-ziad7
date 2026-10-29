@@ -1,35 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Pill, 
-  AlertOctagon, 
-  ShieldAlert, 
-  Activity, 
-  FileCheck, 
-  DollarSign, 
-  Plus, 
-  Check, 
-  HelpCircle,
-  ExternalLink,
-  Clock,
-  ArrowRight
-} from 'lucide-react';
+import { AlertOctagon, ShieldAlert } from 'lucide-react';
 import { DrugMonograph } from '../lib/pharmacopoeia-data';
 import { getDrugClasses, getDrugSpecialties } from '../lib/medical-classification';
 
 interface MonographViewerProps {
   drug: DrugMonograph;
-  isPrescribed: boolean;
-  onTogglePrescription: (drug: DrugMonograph) => void;
   onOpenRenalCalculator: () => void;
   patientClearance?: number;
 }
 
 export const MonographViewer: React.FC<MonographViewerProps> = ({
   drug,
-  isPrescribed,
-  onTogglePrescription,
   onOpenRenalCalculator,
   patientClearance,
 }) => {
@@ -114,29 +97,6 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
             )}
           </div>
 
-          {/* Action CTAs */}
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => onTogglePrescription(drug)}
-              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded transition-colors whitespace-nowrap shadow-xs ${
-                isPrescribed
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                  : 'bg-[#0D9488] hover:bg-[#0F766E] text-white'
-              }`}
-            >
-              {isPrescribed ? (
-                <>
-                  <Check className="w-4 h-4" />
-                  <span>Dans la prescription</span>
-                </>
-              ) : (
-                <>
-                  <Plus className="w-4 h-4" />
-                  <span>Ajouter au plateau</span>
-                </>
-              )}
-            </button>
-          </div>
         </div>
 
         {/* Presentation & Packaging Banner */}

@@ -12,7 +12,7 @@ export interface PharmacologicalClass {
 
 export const MEDICAL_SPECIALTIES: MedicalSpecialty[] = [
   { id: 'medecine-generale', name: 'Médecine générale' },
-  { id: 'cardiologie', name: 'Cardiologie et maladies cardiovasculaires' },
+  { id: 'cardiologie', name: 'Cardiologie' },
   { id: 'pneumologie', name: 'Pneumologie' },
   { id: 'gastro-enterologie', name: 'Gastro-entérologie' },
   { id: 'neurologie', name: 'Neurologie' },
