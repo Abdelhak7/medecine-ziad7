@@ -56,11 +56,11 @@ export const DrugInteractionMatrixScreen: React.FC<DrugInteractionMatrixScreenPr
       {/* Page Title & Clinical Header */}
       <div className="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#0D9488]">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#00A99D]">
             <AlertOctagon className="w-4 h-4 text-[#DC2626]" />
             <span>Sécurité Pharmacologique & Co-prescriptions</span>
           </div>
-          <h1 className="text-xl md:text-2xl font-bold text-[#0F2942] tracking-tight mt-1">
+          <h1 className="text-xl md:text-2xl font-bold text-[#15263D] tracking-tight mt-1">
             Matrice Croisée des Interactions Médicamenteuses
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -74,7 +74,7 @@ export const DrugInteractionMatrixScreen: React.FC<DrugInteractionMatrixScreenPr
             onClick={() => setMatrixMode('full')}
             className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors ${
               matrixMode === 'full'
-                ? 'bg-white text-[#0F2942] shadow-xs'
+                ? 'bg-white text-[#15263D] shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -84,7 +84,7 @@ export const DrugInteractionMatrixScreen: React.FC<DrugInteractionMatrixScreenPr
             onClick={() => setMatrixMode('prescribed')}
             className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors ${
               matrixMode === 'prescribed'
-                ? 'bg-white text-[#0F2942] shadow-xs'
+                ? 'bg-white text-[#15263D] shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -117,7 +117,7 @@ export const DrugInteractionMatrixScreen: React.FC<DrugInteractionMatrixScreenPr
       {/* Matrix Grid Container */}
       <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-xs overflow-hidden">
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#0F2942]">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#15263D]">
             Tableau Croisé ({activeDrugs.length} x {activeDrugs.length} Molécules)
           </span>
           <span className="text-xs text-slate-500 font-medium">
@@ -151,7 +151,7 @@ export const DrugInteractionMatrixScreen: React.FC<DrugInteractionMatrixScreenPr
                 <tr key={rowDrug.id} className="hover:bg-slate-50/50">
                   {/* Row header */}
                   <td className="p-2.5 font-semibold text-slate-900 border-r border-slate-200 sticky left-0 bg-white z-10 whitespace-nowrap">
-                    <div className="font-bold text-[#0F2942]">{rowDrug.brandName}</div>
+                    <div className="font-bold text-[#15263D]">{rowDrug.brandName}</div>
                     <div className="text-[10px] text-slate-400 truncate max-w-[150px]">
                       {rowDrug.dci}
                     </div>
@@ -254,7 +254,7 @@ export const DrugInteractionMatrixScreen: React.FC<DrugInteractionMatrixScreenPr
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   Détail de l&apos;Interaction
                 </span>
-                <h3 className="text-lg font-bold text-[#0F2942]">
+                <h3 className="text-lg font-bold text-[#15263D]">
                   {selectedCellInteraction.drugA.brandName} ({selectedCellInteraction.drugA.dci}) +{' '}
                   {selectedCellInteraction.drugB.brandName} ({selectedCellInteraction.drugB.dci})
                 </h3>
@@ -271,7 +271,7 @@ export const DrugInteractionMatrixScreen: React.FC<DrugInteractionMatrixScreenPr
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs">
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
-              <span className="font-bold text-[#0F2942] uppercase text-[10px] tracking-wider block mb-1">
+              <span className="font-bold text-[#15263D] uppercase text-[10px] tracking-wider block mb-1">
                 Risque Clinique Immédiat
               </span>
               <p className="text-slate-800 leading-relaxed font-medium">
@@ -280,7 +280,7 @@ export const DrugInteractionMatrixScreen: React.FC<DrugInteractionMatrixScreenPr
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
-              <span className="font-bold text-[#0F2942] uppercase text-[10px] tracking-wider block mb-1">
+              <span className="font-bold text-[#15263D] uppercase text-[10px] tracking-wider block mb-1">
                 Mécanisme Pharmacologique
               </span>
               <p className="text-slate-700 leading-relaxed">

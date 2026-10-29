@@ -69,11 +69,11 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
       {/* Title banner */}
       <div className="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#0D9488]">
-            <Calculator className="w-4 h-4 text-[#0D9488]" />
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#00A99D]">
+            <Calculator className="w-4 h-4 text-[#00A99D]" />
             <span>Néphrologie Clinique & Pharmacocinétique</span>
           </div>
-          <h1 className="text-xl md:text-2xl font-bold text-[#0F2942] tracking-tight mt-1">
+          <h1 className="text-xl md:text-2xl font-bold text-[#15263D] tracking-tight mt-1">
             Calculateur de Clairance Rénale & Adaptation Posologique
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -93,7 +93,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Numeric inputs & patient parameters */}
         <div className="lg:col-span-5 bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-xs space-y-5">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-[#0F2942]">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-[#15263D]">
             Paramètres Biologiques du Patient
           </h2>
 
@@ -111,7 +111,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
                 }}
                 className={`py-2 px-3 text-xs font-bold rounded transition-colors text-center ${
                   gender === 'homme'
-                    ? 'bg-[#0F2942] text-white shadow-xs'
+                    ? 'bg-[#15263D] text-white shadow-xs'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -125,7 +125,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
                 }}
                 className={`py-2 px-3 text-xs font-bold rounded transition-colors text-center ${
                   gender === 'femme'
-                    ? 'bg-[#0F2942] text-white shadow-xs'
+                    ? 'bg-[#15263D] text-white shadow-xs'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -138,7 +138,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-semibold text-slate-700">Âge du Patient</label>
-              <span className="font-mono font-bold text-xs text-[#0F2942]">{age} ans</span>
+              <span className="font-mono font-bold text-xs text-[#15263D]">{age} ans</span>
             </div>
             <input
               type="number"
@@ -150,7 +150,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
                 setAge(val);
                 onUpdateParams({ ...currentParams, age: val });
               }}
-              className="w-full h-10 px-3 bg-white border border-[#CBD5E1] rounded-lg text-sm font-mono tabular-nums text-slate-900 focus:outline-none focus:border-[#0D9488]"
+              className="w-full h-10 px-3 bg-white border border-[#CBD5E1] rounded-lg text-sm font-mono tabular-nums text-slate-900 focus:outline-none focus:border-[#00A99D]"
             />
           </div>
 
@@ -158,7 +158,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-semibold text-slate-700">Poids Corporel Réel</label>
-              <span className="font-mono font-bold text-xs text-[#0F2942]">{weightKg} kg</span>
+              <span className="font-mono font-bold text-xs text-[#15263D]">{weightKg} kg</span>
             </div>
             <input
               type="number"
@@ -170,7 +170,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
                 setWeightKg(val);
                 onUpdateParams({ ...currentParams, weightKg: val });
               }}
-              className="w-full h-10 px-3 bg-white border border-[#CBD5E1] rounded-lg text-sm font-mono tabular-nums text-slate-900 focus:outline-none focus:border-[#0D9488]"
+              className="w-full h-10 px-3 bg-white border border-[#CBD5E1] rounded-lg text-sm font-mono tabular-nums text-slate-900 focus:outline-none focus:border-[#00A99D]"
             />
           </div>
 
@@ -187,7 +187,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
                   }}
                   className={`px-1.5 py-0.5 rounded ${
                     creatinineUnit === 'umol_l'
-                      ? 'bg-[#0D9488] text-white font-bold'
+                      ? 'bg-[#00A99D] text-white font-bold'
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
@@ -202,7 +202,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
                   }}
                   className={`px-1.5 py-0.5 rounded ${
                     creatinineUnit === 'mg_l'
-                      ? 'bg-[#0D9488] text-white font-bold'
+                      ? 'bg-[#00A99D] text-white font-bold'
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
@@ -221,7 +221,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
                 setCreatinineValue(val);
                 onUpdateParams({ ...currentParams, creatinineValue: val });
               }}
-              className="w-full h-10 px-3 bg-white border border-[#CBD5E1] rounded-lg text-sm font-mono tabular-nums text-slate-900 focus:outline-none focus:border-[#0D9488]"
+              className="w-full h-10 px-3 bg-white border border-[#CBD5E1] rounded-lg text-sm font-mono tabular-nums text-slate-900 focus:outline-none focus:border-[#00A99D]"
             />
           </div>
 
@@ -241,7 +241,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
                 Clairance Cockcroft-Gault
               </span>
               <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold font-mono text-[#0F2942] tabular-nums">
+                <span className="text-3xl font-extrabold font-mono text-[#15263D] tabular-nums">
                   {results.cockcroftClearanceMlMin}
                 </span>
                 <span className="text-xs font-mono font-semibold text-slate-500 uppercase">
@@ -259,7 +259,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
                 DFG Estimé (CKD-EPI)
               </span>
               <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold font-mono text-[#0D9488] tabular-nums">
+                <span className="text-3xl font-extrabold font-mono text-[#00A99D] tabular-nums">
                   {results.ckdEpiGfrMlMin}
                 </span>
                 <span className="text-xs font-mono font-semibold text-slate-500 uppercase">
@@ -267,7 +267,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
                 </span>
               </div>
               <div className="mt-2 text-xs font-semibold text-slate-700">
-                Stade KDIGO : <span className="text-[#0F2942]">{results.kdigoStage}</span>
+                Stade KDIGO : <span className="text-[#15263D]">{results.kdigoStage}</span>
               </div>
             </div>
           </div>
@@ -308,7 +308,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
           {/* Dynamic Drug Adaptation Table for this Clearance */}
           <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-xs overflow-hidden">
             <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#0F2942]">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#15263D]">
                 Recommandations Thérapeutiques Spécifiques (ClCr = {results.cockcroftClearanceMlMin} ml/min)
               </h3>
               <span className="text-[11px] text-slate-500 font-medium">
@@ -336,7 +336,7 @@ export const RenalDoseCalculatorScreen: React.FC<RenalDoseCalculatorScreenProps>
                     }`}
                   >
                     <div className="w-48 shrink-0">
-                      <span className="font-bold text-[#0F2942] text-sm block">
+                      <span className="font-bold text-[#15263D] text-sm block">
                         {item.brandName}
                       </span>
                       <span className="text-[11px] text-slate-500">{item.dci}</span>

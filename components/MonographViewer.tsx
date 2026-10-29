@@ -35,7 +35,7 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold text-[#0F2942] tracking-tight">
+              <h1 className="text-2xl font-bold text-[#15263D] tracking-tight">
                 {drug.brandName}
               </h1>
               {/* Micro-label regulatory status */}
@@ -61,7 +61,7 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
             </div>
 
             {/* DCI Subtitle & Clean Unboxed Metadata with · separators (Zero-Pill discipline) */}
-            <div className="text-sm font-semibold text-[#0D9488] mt-1">
+            <div className="text-sm font-semibold text-[#00A99D] mt-1">
               DCI : {drug.dci}
             </div>
 
@@ -126,7 +126,7 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
           onClick={() => setActiveTab('posology')}
           className={`py-3 px-3 border-b-2 whitespace-nowrap transition-colors ${
             activeTab === 'posology'
-              ? 'border-[#0D9488] text-[#0F2942] font-bold bg-white'
+              ? 'border-[#00A99D] text-[#15263D] font-bold bg-white'
               : 'border-transparent text-slate-600 hover:text-slate-900'
           }`}
         >
@@ -146,7 +146,7 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
           onClick={() => setActiveTab('cnas')}
           className={`py-3 px-3 border-b-2 whitespace-nowrap transition-colors ${
             activeTab === 'cnas'
-              ? 'border-[#0D9488] text-[#0F2942] font-bold bg-white'
+              ? 'border-[#00A99D] text-[#15263D] font-bold bg-white'
               : 'border-transparent text-slate-600 hover:text-slate-900'
           }`}
         >
@@ -156,7 +156,7 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
           onClick={() => setActiveTab('pharmacokinetics')}
           className={`py-3 px-3 border-b-2 whitespace-nowrap transition-colors ${
             activeTab === 'pharmacokinetics'
-              ? 'border-[#0D9488] text-[#0F2942] font-bold bg-white'
+              ? 'border-[#00A99D] text-[#15263D] font-bold bg-white'
               : 'border-transparent text-slate-600 hover:text-slate-900'
           }`}
         >
@@ -171,7 +171,7 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0F2942] block mb-1.5">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#15263D] block mb-1.5">
                   Posologie Adulte
                 </span>
                 <p className="text-xs text-slate-700 leading-relaxed font-normal">
@@ -184,7 +184,7 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
 
               {drug.pediatricDosage && (
                 <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#0F2942] block mb-1.5">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#15263D] block mb-1.5">
                     Posologie Pédiatrique (mg/kg)
                   </span>
                   <p className="text-xs text-slate-700 leading-relaxed font-normal">
@@ -196,7 +196,7 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
 
             {drug.elderlyDosage && (
               <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                <span className="font-bold text-[#0F2942]">Sujet Âgé (&gt; 75 ans) : </span>
+                <span className="font-bold text-[#15263D]">Sujet Âgé (&gt; 75 ans) : </span>
                 <span className="text-slate-700">{drug.elderlyDosage}</span>
               </div>
             )}
@@ -205,7 +205,7 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
             <div className="border border-slate-200 rounded-lg overflow-hidden">
               <div className="p-3 bg-slate-100/70 border-b border-slate-200 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#0F2942]">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#15263D]">
                     Adaptation selon la Clairance Rénale (Cockcroft-Gault)
                   </span>
                   <span className="block text-[11px] text-slate-500">
@@ -214,7 +214,7 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
                 </div>
                 <button
                   onClick={onOpenRenalCalculator}
-                  className="px-2.5 py-1 text-xs font-semibold bg-[#0F2942] text-white rounded hover:bg-[#1E3A8A] transition-colors"
+                  className="px-2.5 py-1 text-xs font-semibold bg-[#15263D] text-white rounded hover:bg-[#102743] transition-colors"
                 >
                   Calculer clairance patient
                 </button>
@@ -231,15 +231,15 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
                     <div
                       key={idx}
                       className={`p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${
-                        isCurrentPatientRule ? 'bg-teal-50 border-l-4 border-l-[#0D9488]' : ''
+                        isCurrentPatientRule ? 'bg-teal-50 border-l-4 border-l-[#00A99D]' : ''
                       }`}
                     >
                       <div className="w-48 shrink-0">
-                        <span className="font-mono font-bold text-[#0F2942] tabular-nums">
+                        <span className="font-mono font-bold text-[#15263D] tabular-nums">
                           {rule.creatinineClearanceMin} - {rule.creatinineClearanceMax} ml/min
                         </span>
                         {isCurrentPatientRule && (
-                          <span className="ml-2 text-[10px] bg-[#0D9488] text-white font-bold px-1.5 py-0.2 rounded">
+                          <span className="ml-2 text-[10px] bg-[#00A99D] text-white font-bold px-1.5 py-0.2 rounded">
                             Clairance du patient ({patientClearance} ml/min)
                           </span>
                         )}
@@ -377,7 +377,7 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
             {/* Algerian Generics List */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#0F2942]">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#15263D]">
                   Génériques Homologués en Algérie (Substitution Saidal / Biopharm / Hikma)
                 </h3>
                 <span className="text-xs text-slate-500 font-medium">
@@ -399,7 +399,7 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
                       >
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-[#0F2942] text-sm">
+                            <span className="font-bold text-[#15263D] text-sm">
                               {gen.tradeName}
                             </span>
                             <span className="text-[11px] text-slate-500">({gen.laboratory})</span>
@@ -436,7 +436,7 @@ export const MonographViewer: React.FC<MonographViewerProps> = ({
                 <span className="text-slate-500 uppercase tracking-wider font-semibold block mb-1">
                   Demi-vie d&apos;élimination (T 1/2)
                 </span>
-                <span className="font-mono font-semibold text-[#0F2942]">{drug.pharmacokinetics.halfLifeHours}</span>
+                <span className="font-mono font-semibold text-[#15263D]">{drug.pharmacokinetics.halfLifeHours}</span>
               </div>
 
               <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg">

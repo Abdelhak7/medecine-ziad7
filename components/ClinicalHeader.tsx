@@ -1,57 +1,62 @@
 'use client';
 
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, ShieldCheck } from 'lucide-react';
 
 interface ClinicalHeaderProps {
   onOpenAddModal: () => void;
 }
 
-export const ClinicalHeader: React.FC<ClinicalHeaderProps> = ({ onOpenAddModal }) => {
+export const ClinicalHeader: React.FC<ClinicalHeaderProps> = ({
+  onOpenAddModal,
+}) => {
   return (
-    <header className="sticky top-0 z-40 bg-[#0F2942] text-white border-b border-[#1E3A5F]">
-      <div className="max-w-[1720px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3 sm:gap-8">
-        {/* Zone 1: Brand Wordmark */}
-        <div className="flex items-center gap-3 shrink-0 min-w-0">
-          <div className="flex items-center gap-2.5 text-left">
-            <div className="w-8 h-8 rounded bg-[#0D9488] flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0">
-              DZ
-            </div>
-            <div className="leading-tight min-w-0">
-              <span className="text-lg font-bold tracking-tight text-white whitespace-nowrap">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0B1F36] text-white shadow-[0_1px_0_rgba(255,255,255,0.04)]">
+      <div className="mx-auto flex h-14 max-w-[1720px] items-center justify-between gap-4 px-4 sm:h-16 sm:px-6">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#00A99D] text-[13px] font-extrabold tracking-tight text-white shadow-sm ring-1 ring-white/15">
+            DZ
+          </div>
+          <div className="min-w-0 leading-tight">
+            <div className="flex items-center gap-2">
+              <span className="whitespace-nowrap text-[15px] font-bold tracking-tight text-white sm:text-base">
                 PharmaDZ Clinical
               </span>
-              <span className="hidden sm:inline-block ml-2 text-[11px] font-medium text-[#7991AF] uppercase tracking-wider">
-                Pharmacopée & Sécurité Thérapeutique
-              </span>
+              <ShieldCheck className="hidden h-3.5 w-3.5 text-[#5EEAD4] sm:block" />
             </div>
+            <span className="hidden text-[9px] font-semibold uppercase tracking-[0.14em] text-[#8BA3BF] sm:block">
+              Pharmacopée & sécurité thérapeutique
+            </span>
           </div>
         </div>
 
-        {/* Zone 2: Single active navigation item */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <span className="whitespace-nowrap shrink-0 py-1 border-b-2 border-[#0D9488] text-xs uppercase tracking-wider text-[#86F2E4] font-semibold">
-            Monographies & Recherche
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Navigation principale">
+          <span className="flex items-center gap-2 rounded-md border border-[#1C3B5C] bg-[#132F4D] px-3 py-1.5 text-[11px] font-semibold text-[#CFFAF5]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#00A99D]" />
+            Monographies & recherche
           </span>
         </nav>
 
-        {/* Zone 3: primary action */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex shrink-0 items-center gap-2">
           <button
+            type="button"
             onClick={onOpenAddModal}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded border border-[#2B4C74] bg-[#1E3A5F] hover:bg-[#2B4C74] text-slate-200 transition-colors whitespace-nowrap shrink-0"
+            className="flex items-center gap-1.5 rounded-lg bg-[#00A99D] px-3 py-2 text-[11px] font-bold text-white shadow-sm transition-colors hover:bg-[#008F85] focus-visible:outline-white sm:text-xs"
             title="Ajouter un médicament ou une spécialité"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Ajouter</span>
           </button>
         </div>
       </div>
 
-      {/* Mobile nav bar: single active section */}
-      <div className="md:hidden flex items-center justify-between px-3 py-2 bg-[#0A1D30] border-t border-[#1E3A5F] overflow-x-auto text-xs">
-        <span className="px-2.5 py-1 whitespace-nowrap rounded bg-[#0D9488] text-white font-medium">
-          Monographies
+      <div className="flex items-center justify-between border-t border-white/10 bg-[#0A1B2F] px-4 py-1.5 md:hidden">
+        <span className="flex items-center gap-1.5 text-[10px] font-semibold text-[#CFFAF5]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#00A99D]" />
+          Monographies & recherche
+        </span>
+        <span className="text-[9px] font-medium uppercase tracking-[0.12em] text-[#6F88A6]">
+          Pharmacopée
         </span>
       </div>
     </header>

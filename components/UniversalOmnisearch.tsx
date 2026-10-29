@@ -252,8 +252,8 @@ export const UniversalOmnisearch: React.FC<UniversalOmnisearchProps> = ({
   return (
     <div ref={containerRef} className="relative w-full">
       <div className="relative flex items-center">
-        <div className="pointer-events-none absolute left-3.5 text-slate-400">
-          <Search className="h-5 w-5 text-slate-500" />
+        <div className="pointer-events-none absolute left-3 text-slate-400">
+          <Search className="h-4 w-4 text-slate-500" />
         </div>
 
         <input
@@ -267,11 +267,11 @@ export const UniversalOmnisearch: React.FC<UniversalOmnisearchProps> = ({
           }}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder="Rechercher un médicament, une pathologie, une spécialité ou une classe..."
-          className="h-12 w-full rounded-lg border-[1.5px] border-[#CBD5E1] bg-white pl-11 pr-24 text-sm font-medium text-[#191C1E] placeholder:text-slate-400 focus:border-[#0D9488] focus:outline-none focus:ring-0 transition-colors shadow-none"
+          placeholder="Rechercher un médicament, une pathologie, une classe thérapeutique…"
+          className="h-11 w-full rounded-lg border border-[#E2E8F0] bg-white pl-10 pr-24 text-[13px] font-medium text-[#15263D] shadow-[0_1px_2px_rgba(15,41,66,0.04)] placeholder:text-slate-400 transition-all focus:border-[#00A99D] focus:outline-none focus:ring-2 focus:ring-[#00A99D]/15"
         />
 
-        <div className="absolute right-3 flex items-center gap-1.5">
+        <div className="absolute right-2.5 flex items-center gap-1.5">
           {query && (
             <button
               type="button"
@@ -287,15 +287,15 @@ export const UniversalOmnisearch: React.FC<UniversalOmnisearchProps> = ({
             </button>
           )}
 
-          <span className="hidden items-center rounded border border-slate-200 bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-semibold text-slate-500 shadow-xs sm:inline-flex">
+          <span className="hidden items-center rounded border border-[#E2E8F0] bg-[#F8FAFC] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-slate-500 sm:inline-flex">
             ⌘K
           </span>
         </div>
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1.5 max-h-[440px] overflow-y-auto rounded-xl border border-[#E2E8F0] bg-white shadow-[0_4px_20px_-2px_rgba(15,41,66,0.12)]">
-          <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-3.5 py-2 text-[11px] font-medium text-slate-500">
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-[440px] overflow-y-auto rounded-xl border border-[#E2E8F0] bg-white shadow-[0_16px_40px_-12px_rgba(15,41,66,0.22)]">
+          <div className="flex items-center justify-between border-b border-[#E2E8F0] bg-[#F8FAFC] px-3.5 py-2 text-[10px] font-medium text-slate-500">
             <span>
               {hasQuery
                 ? `${flatResults.length} résultat${
@@ -311,19 +311,19 @@ export const UniversalOmnisearch: React.FC<UniversalOmnisearchProps> = ({
           </div>
 
           {!hasQuery ? (
-            <div className="px-4 py-5 text-center text-xs text-slate-500">
+            <div className="px-4 py-5 text-center text-[11px] text-slate-500">
               Saisissez une DCI, un nom commercial, une pathologie, une spécialité
               ou une classe pharmacologique.
             </div>
           ) : flatResults.length === 0 ? (
-            <div className="px-6 py-6 text-center text-sm text-slate-500">
+            <div className="px-6 py-6 text-center text-xs text-slate-500">
               Aucun résultat pour «&nbsp;{query}&nbsp;».
             </div>
           ) : (
             <div>
               {groups.map((group) => (
                 <div key={group.label}>
-                  <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  <div className="flex items-center justify-between border-b border-[#F1F5F9] bg-[#F8FAFC] px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">
                     <span>{group.label}</span>
                     <span className="font-mono text-slate-400">
                       {group.results.length}
@@ -340,19 +340,21 @@ export const UniversalOmnisearch: React.FC<UniversalOmnisearchProps> = ({
                           type="button"
                           onMouseEnter={() => setHighlightIndex(resultIndex)}
                           onClick={() => handleSelect(result)}
-                          className={`flex w-full items-center justify-between gap-3 px-3.5 py-2.5 text-left transition-colors ${
-                            highlighted ? 'bg-slate-50' : 'hover:bg-slate-50/70'
+                          className={`flex w-full items-center justify-between gap-3 border-l-2 px-3.5 py-2.5 text-left transition-colors ${
+                            highlighted
+                              ? 'border-[#00A99D] bg-[#E8F8F5]'
+                              : 'border-transparent hover:bg-[#F8FAFC]'
                           }`}
                         >
                           <span className="flex min-w-0 items-start gap-2.5">
-                            <span className="mt-0.5 shrink-0 rounded border border-slate-200 bg-white p-1 text-[#0D9488]">
+                            <span className="mt-0.5 shrink-0 rounded-md border border-[#E2E8F0] bg-white p-1 text-[#00A99D]">
                               {renderResultIcon(result)}
                             </span>
                             <span className="min-w-0">
-                              <span className="block truncate text-sm font-semibold text-[#0F2942]">
+                              <span className="block truncate text-[13px] font-semibold text-[#15263D]">
                                 {result.label}
                               </span>
-                              <span className="mt-0.5 block truncate text-[11px] text-slate-500">
+                              <span className="mt-0.5 block truncate text-[10px] text-slate-500">
                                 {result.detail}
                               </span>
                             </span>

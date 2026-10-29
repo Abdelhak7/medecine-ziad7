@@ -25,9 +25,9 @@ export const RenalModalDrawer: React.FC<RenalModalDrawerProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
       <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-[0_4px_25px_-2px_rgba(15,41,66,0.18)] max-w-lg w-full overflow-hidden">
         {/* Header */}
-        <div className="p-4 bg-[#0F2942] text-white flex items-center justify-between">
+        <div className="p-4 bg-[#15263D] text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Calculator className="w-4 h-4 text-[#86F2E4]" />
+            <Calculator className="w-4 h-4 text-[#B8F1EA]" />
             <span className="font-bold text-xs uppercase tracking-wider">
               Clairance de la Créatinine (Cockcroft-Gault)
             </span>
@@ -48,7 +48,7 @@ export const RenalModalDrawer: React.FC<RenalModalDrawerProps> = ({
                 onClick={() => onUpdateParams({ ...params, gender: 'homme' })}
                 className={`py-2 px-3 font-semibold rounded text-center transition-colors ${
                   params.gender === 'homme'
-                    ? 'bg-[#0F2942] text-white'
+                    ? 'bg-[#15263D] text-white'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -59,7 +59,7 @@ export const RenalModalDrawer: React.FC<RenalModalDrawerProps> = ({
                 onClick={() => onUpdateParams({ ...params, gender: 'femme' })}
                 className={`py-2 px-3 font-semibold rounded text-center transition-colors ${
                   params.gender === 'femme'
-                    ? 'bg-[#0F2942] text-white'
+                    ? 'bg-[#15263D] text-white'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -103,7 +103,7 @@ export const RenalModalDrawer: React.FC<RenalModalDrawerProps> = ({
                   onClick={() => onUpdateParams({ ...params, creatinineUnit: 'umol_l' })}
                   className={`px-1.5 py-0.5 rounded ${
                     params.creatinineUnit === 'umol_l'
-                      ? 'bg-[#0D9488] text-white font-bold'
+                      ? 'bg-[#00A99D] text-white font-bold'
                       : 'text-slate-500'
                   }`}
                 >
@@ -115,7 +115,7 @@ export const RenalModalDrawer: React.FC<RenalModalDrawerProps> = ({
                   onClick={() => onUpdateParams({ ...params, creatinineUnit: 'mg_l' })}
                   className={`px-1.5 py-0.5 rounded ${
                     params.creatinineUnit === 'mg_l'
-                      ? 'bg-[#0D9488] text-white font-bold'
+                      ? 'bg-[#00A99D] text-white font-bold'
                       : 'text-slate-500'
                   }`}
                 >
@@ -148,7 +148,7 @@ export const RenalModalDrawer: React.FC<RenalModalDrawerProps> = ({
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
                 Stade KDIGO
               </span>
-              <span className="font-bold text-[#0F2942] text-sm">
+              <span className="font-bold text-[#15263D] text-sm">
                 {results.kdigoStage}
               </span>
             </div>
@@ -159,7 +159,7 @@ export const RenalModalDrawer: React.FC<RenalModalDrawerProps> = ({
         <div className="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-[#0F2942] hover:bg-[#1E3A8A] text-white text-xs font-semibold rounded transition-colors"
+            className="px-4 py-2 bg-[#15263D] hover:bg-[#102743] text-white text-xs font-semibold rounded transition-colors"
           >
             Appliquer & Fermer
           </button>

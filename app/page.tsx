@@ -272,7 +272,7 @@ export default function ClinicalApp() {
           <button
             type="button"
             onClick={() => setSelectedDrug(null)}
-            className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 transition-colors hover:text-[#0D9488]"
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 transition-colors hover:text-[#00A99D]"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             {backLabel}
@@ -304,7 +304,7 @@ export default function ClinicalApp() {
           <button
             type="button"
             onClick={() => setSelectedSpecialtyId(null)}
-            className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 transition-colors hover:text-[#0D9488]"
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 transition-colors hover:text-[#00A99D]"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Toutes les spécialités
@@ -313,10 +313,10 @@ export default function ClinicalApp() {
           <section className="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[#0D9488]">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#00A99D]">
                   Spécialité médicale
                 </p>
-                <h1 className="mt-1 text-xl font-bold tracking-tight text-[#0F2942]">
+                <h1 className="mt-1 text-[22px] font-bold tracking-tight text-[#15263D]">
                   {selectedSpecialty.name}
                 </h1>
                 <p className="mt-2 text-xs text-slate-500">
@@ -333,7 +333,7 @@ export default function ClinicalApp() {
           {specialtyPathologies.length === 0 ? (
             <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
               <FileText className="mx-auto mb-2 h-5 w-5 text-slate-400" />
-              <p className="text-sm font-semibold text-[#0F2942]">
+              <p className="text-sm font-semibold text-[#15263D]">
                 Aucune pathologie vérifiée disponible pour cette spécialité.
               </p>
               <p className="mt-1 text-xs text-slate-500">
@@ -357,7 +357,7 @@ export default function ClinicalApp() {
                     className="group rounded-xl border border-[#E2E8F0] bg-white p-4 text-left shadow-xs transition-colors hover:border-teal-300 hover:bg-teal-50/30"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <span className="rounded border border-slate-200 bg-slate-50 p-1.5 text-[#0D9488]">
+                      <span className="rounded border border-slate-200 bg-slate-50 p-1.5 text-[#00A99D]">
                         <FileText className="h-3.5 w-3.5" />
                       </span>
                       <span className="rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[10px] text-slate-500">
@@ -365,7 +365,7 @@ export default function ClinicalApp() {
                         {medications.length > 1 ? 's' : ''}
                       </span>
                     </div>
-                    <h2 className="mt-2 text-sm font-bold text-[#0F2942]">
+                    <h2 className="mt-2 text-sm font-bold text-[#15263D]">
                       {pathology.name}
                     </h2>
                     <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-slate-500">
@@ -383,7 +383,7 @@ export default function ClinicalApp() {
                         ))}
                       </div>
                     )}
-                    <span className="mt-3 flex items-center gap-1 text-[11px] font-semibold text-[#0D9488]">
+                    <span className="mt-3 flex items-center gap-1 text-[11px] font-semibold text-[#00A99D]">
                       Consulter
                       <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
                     </span>
@@ -402,7 +402,7 @@ export default function ClinicalApp() {
           <button
             type="button"
             onClick={() => setSelectedClass(null)}
-            className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 transition-colors hover:text-[#0D9488]"
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 transition-colors hover:text-[#00A99D]"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Toutes les classes pharmacologiques
@@ -411,10 +411,10 @@ export default function ClinicalApp() {
           <section className="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[#0D9488]">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#00A99D]">
                   Classe pharmacologique
                 </p>
-                <h1 className="mt-1 text-xl font-bold tracking-tight text-[#0F2942]">
+                <h1 className="mt-1 text-[22px] font-bold tracking-tight text-[#15263D]">
                   {selectedClass}
                 </h1>
                 <p className="mt-2 text-xs text-slate-500">
@@ -441,10 +441,10 @@ export default function ClinicalApp() {
       return (
         <div className="space-y-4">
           <section className="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-[#0D9488]">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#00A99D]">
               Navigation clinique
             </p>
-            <h1 className="mt-1 text-xl font-bold tracking-tight text-[#0F2942]">
+            <h1 className="mt-1 text-[22px] font-bold tracking-tight text-[#15263D]">
               Pathologies par spécialité
             </h1>
             <p className="mt-2 text-xs text-slate-500">
@@ -464,8 +464,8 @@ export default function ClinicalApp() {
                   className="flex items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-white px-3.5 py-3 text-left shadow-xs transition-colors hover:border-teal-300 hover:bg-teal-50/30"
                 >
                   <span className="flex min-w-0 items-center gap-2">
-                    <Stethoscope className="h-3.5 w-3.5 shrink-0 text-[#0D9488]" />
-                    <span className="truncate text-xs font-semibold text-[#0F2942]">
+                    <Stethoscope className="h-3.5 w-3.5 shrink-0 text-[#00A99D]" />
+                    <span className="truncate text-xs font-semibold text-[#15263D]">
                       {specialty.name}
                     </span>
                   </span>
@@ -490,10 +490,10 @@ export default function ClinicalApp() {
       return (
         <div className="space-y-4">
           <section className="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-[#0D9488]">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#00A99D]">
               Navigation médicamenteuse
             </p>
-            <h1 className="mt-1 text-xl font-bold tracking-tight text-[#0F2942]">
+            <h1 className="mt-1 text-[22px] font-bold tracking-tight text-[#15263D]">
               Médicaments par classe pharmacologique
             </h1>
             <p className="mt-2 text-xs text-slate-500">
@@ -513,8 +513,8 @@ export default function ClinicalApp() {
                   className="flex items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-white px-3.5 py-3 text-left shadow-xs transition-colors hover:border-teal-300 hover:bg-teal-50/30"
                 >
                   <span className="flex min-w-0 items-center gap-2">
-                    <Pill className="h-3.5 w-3.5 shrink-0 text-[#0D9488]" />
-                    <span className="truncate text-xs font-semibold text-[#0F2942]">
+                    <Pill className="h-3.5 w-3.5 shrink-0 text-[#00A99D]" />
+                    <span className="truncate text-xs font-semibold text-[#15263D]">
                       {pharmacologicalClass}
                     </span>
                   </span>
@@ -538,10 +538,10 @@ export default function ClinicalApp() {
     return (
       <div className="space-y-4">
         <section className="rounded-xl border border-[#E2E8F0] bg-white p-6 shadow-xs">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#0D9488]">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[#00A99D]">
             Exploration clinique
           </p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-[#0F2942]">
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-[#15263D]">
             Rechercher et consulter la pharmacopée
           </h1>
           <p className="mt-2 max-w-2xl text-xs leading-relaxed text-slate-500">
@@ -557,12 +557,12 @@ export default function ClinicalApp() {
               className="group rounded-xl border border-[#E2E8F0] bg-white p-4 text-left transition-colors hover:border-teal-300 hover:bg-teal-50/30"
             >
               <div className="flex items-start justify-between gap-3">
-                <span className="rounded-lg border border-teal-100 bg-teal-50 p-2 text-[#0D9488]">
+                <span className="rounded-lg border border-teal-100 bg-teal-50 p-2 text-[#00A99D]">
                   <Stethoscope className="h-4 w-4" />
                 </span>
-                <ArrowRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-[#0D9488]" />
+                <ArrowRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-[#00A99D]" />
               </div>
-              <h2 className="mt-3 text-sm font-bold text-[#0F2942]">
+              <h2 className="mt-3 text-sm font-bold text-[#15263D]">
                 Pathologies par spécialité
               </h2>
               <p className="mt-1 text-[11px] text-slate-500">
@@ -577,12 +577,12 @@ export default function ClinicalApp() {
               className="group rounded-xl border border-[#E2E8F0] bg-white p-4 text-left transition-colors hover:border-teal-300 hover:bg-teal-50/30"
             >
               <div className="flex items-start justify-between gap-3">
-                <span className="rounded-lg border border-teal-100 bg-teal-50 p-2 text-[#0D9488]">
+                <span className="rounded-lg border border-teal-100 bg-teal-50 p-2 text-[#00A99D]">
                   <Pill className="h-4 w-4" />
                 </span>
-                <ArrowRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-[#0D9488]" />
+                <ArrowRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-[#00A99D]" />
               </div>
-              <h2 className="mt-3 text-sm font-bold text-[#0F2942]">
+              <h2 className="mt-3 text-sm font-bold text-[#15263D]">
                 Médicaments par classe pharmacologique
               </h2>
               <p className="mt-1 text-[11px] text-slate-500">
@@ -593,7 +593,7 @@ export default function ClinicalApp() {
 
           <div className="mt-4 grid grid-cols-3 gap-2 border-t border-slate-100 pt-4">
             <div>
-              <p className="font-mono text-lg font-bold text-[#0F2942]">
+              <p className="font-mono text-lg font-bold text-[#15263D]">
                 {drugs.length}
               </p>
               <p className="text-[10px] uppercase tracking-wide text-slate-400">
@@ -601,7 +601,7 @@ export default function ClinicalApp() {
               </p>
             </div>
             <div>
-              <p className="font-mono text-lg font-bold text-[#0F2942]">
+              <p className="font-mono text-lg font-bold text-[#15263D]">
                 {PATHOLOGY_DATABASE.length}
               </p>
               <p className="text-[10px] uppercase tracking-wide text-slate-400">
@@ -609,7 +609,7 @@ export default function ClinicalApp() {
               </p>
             </div>
             <div>
-              <p className="font-mono text-lg font-bold text-[#0F2942]">
+              <p className="font-mono text-lg font-bold text-[#15263D]">
                 {pharmacologicalClasses.length}
               </p>
               <p className="text-[10px] uppercase tracking-wide text-slate-400">
@@ -620,7 +620,7 @@ export default function ClinicalApp() {
         </section>
 
         <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-[#F1F5F9] px-4 py-3 text-[11px] text-slate-600">
-          <Layers className="h-3.5 w-3.5 shrink-0 text-[#0D9488]" />
+          <Layers className="h-3.5 w-3.5 shrink-0 text-[#00A99D]" />
           Les pathologies et associations affichées proviennent uniquement des
           données vérifiées déjà présentes dans la pharmacopée.
         </div>
@@ -629,12 +629,12 @@ export default function ClinicalApp() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#F8FAFC] font-sans text-[#191C1E] selection:bg-[#86F2E4] selection:text-[#00201D]">
+    <div className="flex min-h-screen flex-col bg-[#F4F7FB] font-sans text-[#15263D] selection:bg-[#B8F1EA] selection:text-[#0B1F36]">
       <ClinicalHeader onOpenAddModal={() => setIsAddModalOpen(true)} />
 
       <main className="mx-auto w-full max-w-[1720px] flex-1 px-4 py-6 sm:px-6">
         <div className="space-y-5">
-          <div className="mx-auto w-full max-w-4xl">
+          <div className="mx-auto w-full max-w-3xl">
             <UniversalOmnisearch
               drugs={drugs}
               pathologies={PATHOLOGY_DATABASE}
@@ -650,7 +650,7 @@ export default function ClinicalApp() {
           </div>
 
           <div className="flex flex-col items-start gap-6 lg:flex-row">
-            <div className="hidden w-72 shrink-0 lg:sticky lg:top-20 lg:block">
+            <div className="hidden w-[272px] shrink-0 lg:sticky lg:top-[5.25rem] lg:block lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1">
               <SpecialtySidebar
                 specialties={specialties}
                 pathologies={PATHOLOGY_DATABASE}
@@ -672,8 +672,8 @@ export default function ClinicalApp() {
                 onClick={() => setIsSidebarOpen(true)}
                 className="flex w-full items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-white px-3.5 py-2.5 text-left shadow-xs lg:hidden"
               >
-                <span className="flex items-center gap-2 text-xs font-semibold text-[#0F2942]">
-                  <Menu className="h-4 w-4 text-[#0D9488]" />
+                <span className="flex items-center gap-2 text-xs font-semibold text-[#15263D]">
+                  <Menu className="h-4 w-4 text-[#00A99D]" />
                   Parcourir les pathologies et les classes
                 </span>
                 <span className="font-mono text-[10px] text-slate-400">
@@ -695,13 +695,13 @@ export default function ClinicalApp() {
             onClick={() => setIsSidebarOpen(false)}
             className="absolute inset-0 bg-black/40"
           />
-          <div className="absolute inset-y-0 left-0 w-[88%] max-w-sm overflow-y-auto bg-[#F8FAFC] p-4 shadow-2xl">
+          <div className="absolute inset-y-0 left-0 w-[88%] max-w-sm overflow-y-auto bg-[#F4F7FB] p-4 shadow-2xl">
             <div className="mb-3 flex items-center justify-between gap-3">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[#0D9488]">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#00A99D]">
                   Navigation
                 </p>
-                <p className="text-sm font-bold text-[#0F2942]">
+                <p className="text-sm font-bold text-[#15263D]">
                   Pathologies & Médicaments
                 </p>
               </div>
@@ -751,7 +751,7 @@ export default function ClinicalApp() {
       <footer className="mt-auto border-t border-slate-200 bg-white py-6 text-xs text-slate-500">
         <div className="mx-auto flex max-w-[1720px] flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-[#0F2942]">PharmaDZ Clinical</span>
+            <span className="font-bold text-[#15263D]">PharmaDZ Clinical</span>
             <span>·</span>
             <span>
               Nomenclature Pharmaceutique & Règles de Bonnes Pratiques

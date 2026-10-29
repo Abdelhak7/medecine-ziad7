@@ -2,50 +2,64 @@
 
 @layer base {
   :root {
-    --primary: #0f2942;
-    --primary-dark: #001428;
-    --secondary: #0d9488;
-    --secondary-container: #86f2e4;
+    --primary: #102743;
+    --primary-dark: #0b1f36;
+    --secondary: #00a99d;
+    --secondary-soft: #e8f8f5;
     --crimson: #dc2626;
     --crimson-bg: #fef2f2;
-    --crimson-border: #f87171;
-    --amber: #d97706;
+    --crimson-border: #fecaca;
+    --amber: #f59e0b;
     --amber-bg: #fffbeb;
-    --amber-border: #fcd34d;
-    --surface: #f8fafc;
+    --amber-border: #fde68a;
+    --surface: #f4f7fb;
     --surface-card: #ffffff;
-    --surface-subtle: #f1f5f9;
+    --surface-subtle: #f8fafc;
     --border-neutral: #e2e8f0;
-    --text-primary: #191c1e;
-    --text-secondary: #475569;
-    --text-muted: #64748b;
+    --text-primary: #15263d;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+  }
+
+  html {
+    background-color: var(--surface);
   }
 
   body {
-    background-color: #f8fafc;
-    color: #191c1e;
-    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    background-color: var(--surface);
+    color: var(--text-primary);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
     font-feature-settings: "tnum" on, "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid #00a99d;
+    outline-offset: 2px;
   }
 }
 
-/* Tabular figures for clinical metrics and DZD pricing */
+::selection {
+  background: #b8f1ea;
+  color: #0b1f36;
+}
+
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
-/* Custom crisp scrollbar for clinical panels */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 3px;
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;

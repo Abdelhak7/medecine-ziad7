@@ -41,9 +41,9 @@ export const InteractionScreeningDrawer: React.FC<InteractionScreeningDrawerProp
       }`}
     >
       {/* Header */}
-      <div className="p-4 border-b border-[#F1F5F9] bg-[#0F2942] text-white rounded-t-xl flex items-center justify-between">
+      <div className="p-4 border-b border-[#F1F5F9] bg-[#15263D] text-white rounded-t-xl flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ShieldAlert className="w-4 h-4 text-[#86F2E4]" />
+          <ShieldAlert className="w-4 h-4 text-[#B8F1EA]" />
           <div>
             <h2 className="text-xs font-bold uppercase tracking-wider text-white">
               Plateau de Sécurité Thérapeutique
@@ -77,7 +77,7 @@ export const InteractionScreeningDrawer: React.FC<InteractionScreeningDrawerProp
         {/* Prescription basket list */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="font-bold text-[#0F2942] uppercase text-[11px] tracking-wider">
+            <span className="font-bold text-[#15263D] uppercase text-[11px] tracking-wider">
               Médiations Actives ({prescribedDrugs.length})
             </span>
             <span className="text-[11px] text-slate-500 font-mono">
@@ -126,7 +126,7 @@ export const InteractionScreeningDrawer: React.FC<InteractionScreeningDrawerProp
         {prescribedDrugs.length >= 2 && (
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="font-bold text-[#0F2942] uppercase text-[11px] tracking-wider">
+              <span className="font-bold text-[#15263D] uppercase text-[11px] tracking-wider">
                 Analyse Croisée des Risques
               </span>
             </div>
@@ -188,7 +188,7 @@ export const InteractionScreeningDrawer: React.FC<InteractionScreeningDrawerProp
               </span>
               <button
                 onClick={onOpenRenalModal}
-                className="text-[11px] text-[#0D9488] font-semibold hover:underline"
+                className="text-[11px] text-[#00A99D] font-semibold hover:underline"
               >
                 Ajuster ClCr
               </button>
@@ -214,7 +214,7 @@ export const InteractionScreeningDrawer: React.FC<InteractionScreeningDrawerProp
             onClick={onOpenRenalModal}
             className="w-full py-2 px-3 text-xs font-medium border border-slate-200 hover:bg-slate-100 rounded text-slate-700 flex items-center justify-center gap-1.5 transition-colors"
           >
-            <Calculator className="w-3.5 h-3.5 text-[#0D9488]" />
+            <Calculator className="w-3.5 h-3.5 text-[#00A99D]" />
             <span>Calculer Clairance (Cockcroft)</span>
           </button>
         </div>

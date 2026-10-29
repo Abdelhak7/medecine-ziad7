@@ -78,11 +78,11 @@ export const CnasFormularyScreen: React.FC<CnasFormularyScreenProps> = ({
       {/* Title Header */}
       <div className="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#0D9488]">
-            <FileText className="w-4 h-4 text-[#0D9488]" />
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#00A99D]">
+            <FileText className="w-4 h-4 text-[#00A99D]" />
             <span>Nomenclature Nationale & Sécurité Sociale Algérienne</span>
           </div>
-          <h1 className="text-xl md:text-2xl font-bold text-[#0F2942] tracking-tight mt-1">
+          <h1 className="text-xl md:text-2xl font-bold text-[#15263D] tracking-tight mt-1">
             Répertoire des Génériques & Tarifs de Référence CNAS
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -110,7 +110,7 @@ export const CnasFormularyScreen: React.FC<CnasFormularyScreenProps> = ({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Filtrer par princeps, générique ou DCI (ex: Saidal, Lovenox, Metformine)..."
-            className="w-full h-10 pl-9 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#0D9488] focus:bg-white transition-colors"
+            className="w-full h-10 pl-9 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00A99D] focus:bg-white transition-colors"
           />
         </div>
 
@@ -119,7 +119,7 @@ export const CnasFormularyScreen: React.FC<CnasFormularyScreenProps> = ({
           <select
             value={selectedLab}
             onChange={(e) => setSelectedLab(e.target.value)}
-            className="h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 font-medium focus:outline-none focus:border-[#0D9488]"
+            className="h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 font-medium focus:outline-none focus:border-[#00A99D]"
           >
             <option value="Tous">Tous les laboratoires</option>
             <option value="Saidal">Groupe Saidal</option>
@@ -160,12 +160,12 @@ export const CnasFormularyScreen: React.FC<CnasFormularyScreenProps> = ({
                         Princeps
                       </span>
                     ) : (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#0D9488] text-white uppercase tracking-wider">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#00A99D] text-white uppercase tracking-wider">
                         Générique
                       </span>
                     )}
                   </td>
-                  <td className="p-3 font-bold text-[#0F2942] whitespace-nowrap">
+                  <td className="p-3 font-bold text-[#15263D] whitespace-nowrap">
                     {row.tradeName}
                   </td>
                   <td className="p-3 text-slate-600 font-medium whitespace-nowrap">

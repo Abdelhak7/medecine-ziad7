@@ -50,7 +50,7 @@ export const EmergencyProtocolsScreen: React.FC<EmergencyProtocolsScreenProps> =
             <Flame className="w-4 h-4 text-[#DC2626]" />
             <span>Déchoquage & Réanimation Hospitalière</span>
           </div>
-          <h1 className="text-xl md:text-2xl font-bold text-[#0F2942] tracking-tight mt-1">
+          <h1 className="text-xl md:text-2xl font-bold text-[#15263D] tracking-tight mt-1">
             Protocoles d&apos;Urgence & Arbres Décisionnels
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -77,7 +77,7 @@ export const EmergencyProtocolsScreen: React.FC<EmergencyProtocolsScreenProps> =
                     {proto.specialty}
                   </span>
                 </div>
-                <h2 className="text-lg font-bold text-[#0F2942]">
+                <h2 className="text-lg font-bold text-[#15263D]">
                   {proto.title}
                 </h2>
                 <p className="text-xs text-slate-600 mt-1">
@@ -87,7 +87,7 @@ export const EmergencyProtocolsScreen: React.FC<EmergencyProtocolsScreenProps> =
 
               <button
                 onClick={() => handleLoadProtocol(proto)}
-                className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold bg-[#0F2942] hover:bg-[#1E3A8A] text-white rounded transition-colors whitespace-nowrap shrink-0 self-start sm:self-auto"
+                className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold bg-[#15263D] hover:bg-[#102743] text-white rounded transition-colors whitespace-nowrap shrink-0 self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
                 <span>Charger dans le plateau</span>
@@ -102,7 +102,7 @@ export const EmergencyProtocolsScreen: React.FC<EmergencyProtocolsScreenProps> =
                   className="p-4 bg-slate-50/70 border border-slate-200 rounded-lg space-y-3"
                 >
                   <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
-                    <span className="w-5 h-5 rounded-full bg-[#0D9488] text-white flex items-center justify-center text-xs">
+                    <span className="w-5 h-5 rounded-full bg-[#00A99D] text-white flex items-center justify-center text-xs">
                       {idx + 1}
                     </span>
                     <span>{step.phase}</span>
@@ -124,13 +124,13 @@ export const EmergencyProtocolsScreen: React.FC<EmergencyProtocolsScreenProps> =
                           <div
                             key={pIdx}
                             onClick={() => drug && onSelectDrugForMonograph(drug)}
-                            className="p-3 bg-white border border-slate-200 rounded-lg flex items-start justify-between gap-2 hover:border-[#0D9488] cursor-pointer transition-colors"
+                            className="p-3 bg-white border border-slate-200 rounded-lg flex items-start justify-between gap-2 hover:border-[#00A99D] cursor-pointer transition-colors"
                           >
                             <div>
-                              <div className="font-bold text-[#0F2942]">
+                              <div className="font-bold text-[#15263D]">
                                 {drug?.brandName || presc.drugId}
                               </div>
-                              <div className="text-[11px] font-mono text-[#0D9488] font-semibold mt-0.5">
+                              <div className="text-[11px] font-mono text-[#00A99D] font-semibold mt-0.5">
                                 {presc.posology}
                               </div>
                               <div className="text-[10px] text-slate-500 mt-0.5">
